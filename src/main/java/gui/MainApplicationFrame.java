@@ -17,16 +17,9 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 
-/**
- * Что требуется сделать:
- * 1. Метод создания меню перегружен функционалом и трудно читается. 
- * Следует разделить его на серию более простых методов (или вообще выделить отдельный класс).
- *
- */
 public class MainApplicationFrame extends JFrame
 {
     private final JDesktopPane desktopPane = new JDesktopPane();
-    
     public MainApplicationFrame() {
         //Make the big window be indented 50 pixels from each edge
         //of the screen.
@@ -37,7 +30,6 @@ public class MainApplicationFrame extends JFrame
             screenSize.height - inset*2);
 
         setContentPane(desktopPane);
-        
         
         LogWindow logWindow = createLogWindow();
         addWindow(logWindow);
@@ -99,49 +91,50 @@ public class MainApplicationFrame extends JFrame
     private JMenuBar generateMenuBar()
     {
         JMenuBar menuBar = new JMenuBar();
-        
-        JMenu lookAndFeelMenu = new JMenu("Режим отображения");
-        lookAndFeelMenu.setMnemonic(KeyEvent.VK_V);
-        lookAndFeelMenu.getAccessibleContext().setAccessibleDescription(
-                "Управление режимом отображения приложения");
-        
-        {
-            JMenuItem systemLookAndFeel = new JMenuItem("Системная схема", KeyEvent.VK_S);
-            systemLookAndFeel.addActionListener((event) -> {
-                setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                this.invalidate();
-            });
-            lookAndFeelMenu.add(systemLookAndFeel);
-        }
-
-        {
-            JMenuItem crossplatformLookAndFeel = new JMenuItem("Универсальная схема", KeyEvent.VK_S);
-            crossplatformLookAndFeel.addActionListener((event) -> {
-                setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-                this.invalidate();
-            });
-            lookAndFeelMenu.add(crossplatformLookAndFeel);
-        }
-
-        JMenu testMenu = new JMenu("Тесты");
-        testMenu.setMnemonic(KeyEvent.VK_T);
-        testMenu.getAccessibleContext().setAccessibleDescription(
-                "Тестовые команды");
-        
-        {
-            JMenuItem addLogMessageItem = new JMenuItem("Сообщение в лог", KeyEvent.VK_S);
-            addLogMessageItem.addActionListener((event) -> {
-                Logger.debug("Новая строка");
-            });
-            testMenu.add(addLogMessageItem);
-        }
-
-        menuBar.add(lookAndFeelMenu);
+        JMenu visualModeMenu = CreateVisualModeMenu();
+        JMenu testMenu = CreateTestMenu();
+        menuBar.add(visualModeMenu);
         menuBar.add(testMenu);
         return menuBar;
     }
+
+    private JMenu CreateTestMenu()
+    {
+        JMenu testMenu = new JMenu("Тесты");
+        testMenu.setMnemonic(KeyEvent.VK_T);
+        testMenu.getAccessibleContext()
+                .setAccessibleDescription("Тестовые команды");
+        JMenuItem addLogMessageItem = new JMenuItem("Сообщение в лог", KeyEvent.VK_S);
+        addLogMessageItem.addActionListener((event) -> {
+            Logger.debug("Новая строка");
+        });
+        testMenu.add(addLogMessageItem);
+        return testMenu;
+    }
+
+    private JMenu CreateVisualModeMenu()
+    {
+        JMenu visualModeMenu = new JMenu("Режим отображения");
+        visualModeMenu.setMnemonic(KeyEvent.VK_V);
+        visualModeMenu
+                .getAccessibleContext()
+                .setAccessibleDescription("Управление режимом отображения приложения");
+        JMenuItem systemMode = new JMenuItem("Системная схема", KeyEvent.VK_S);
+        systemMode.addActionListener((event) -> {
+            setVisualMode(UIManager.getSystemLookAndFeelClassName());
+            this.invalidate();
+        });
+        visualModeMenu.add(systemMode);
+        JMenuItem crossplatformMode = new JMenuItem("Универсальная схема", KeyEvent.VK_S);
+        crossplatformMode.addActionListener((event) -> {
+            setVisualMode(UIManager.getCrossPlatformLookAndFeelClassName());
+            this.invalidate();
+        });
+        visualModeMenu.add(crossplatformMode);
+        return visualModeMenu;
+    }
     
-    private void setLookAndFeel(String className)
+    private void setVisualMode(String className)
     {
         try
         {
