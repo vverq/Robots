@@ -49,7 +49,7 @@ public class MainApplicationFrame extends JFrame
     {
         GameWindow gameWindow = new GameWindow();
         gameWindow.setSize(400, 400);
-        gameWindow.setAlignmentX(GameWindow.CENTER_ALIGNMENT);
+//        gameWindow.setAlignmentX(GameWindow.CENTER_ALIGNMENT);
         return gameWindow;
     }
     
