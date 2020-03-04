@@ -8,5 +8,5 @@ The project to learn OO design concepts and MDI application development in Java
 * [X] fix the class LogWindowSource
 * [X] fix bug with bounds
 * [X] fix resource leak
-* [ ] create Robot class
+* [ ] create Robot and Target classes
 * [ ] fix bug with target
