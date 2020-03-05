@@ -14,5 +14,4 @@ The project to learn OO design concepts and MDI application development in Java
 * [ ] fix bug with target
 
 
-* optimize threads?
-* Atomic classes?
+// optimize threads? Atomic classes?
