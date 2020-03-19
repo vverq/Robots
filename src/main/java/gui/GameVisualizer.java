@@ -36,7 +36,7 @@ public class GameVisualizer extends JPanel
     private static final double maxVelocity = 0.1;
     private static final double maxAngularVelocity = 0.01;
 
-    public GameVisualizer()
+    GameVisualizer()
     {
         m_timer.schedule(new TimerTask()
         {
@@ -66,13 +66,13 @@ public class GameVisualizer extends JPanel
         setDoubleBuffered(true);
     }
 
-    protected void setTargetPosition(Point p)
+    private void setTargetPosition(Point p)
     {
         target.setM_targetPositionX(p.x);
         target.setM_targetPositionY(p.y);;
     }
 
-    protected void onRedrawEvent()
+    private void onRedrawEvent()
     {
         EventQueue.invokeLater(this::repaint);
     }

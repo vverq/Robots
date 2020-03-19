@@ -11,7 +11,7 @@ import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
 
-public class MainApplicationFrame extends JFrame
+class MainApplicationFrame extends JFrame
 {
     private final JDesktopPane desktopPane = new JDesktopPane();
     private Locale locale = Locale.getDefault();
@@ -20,28 +20,44 @@ public class MainApplicationFrame extends JFrame
     private LogWindow logWindow;
     private GameWindow gameWindow;
     private JMenuBar menuBar;
+    private ExitWindow exitWindow;
 
     MainApplicationFrame()
     {
         setLocationRelativeTo(null);
         setContentPane(desktopPane);
 
-        logWindow = createLogWindow();
-        addWindow(logWindow);
-
-        gameWindow = createGameWindow();
-        addWindow(gameWindow);
-
         menuBar = generateMenuBar();
-        setJMenuBar(menuBar);
+        logWindow = createLogWindow();
+        gameWindow = createGameWindow();
+        exitWindow = createExitWindow();
 
+        setJMenuBar(menuBar);
+        addWindow(logWindow);
+        addWindow(gameWindow);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
+
+        addWindowListener(new WindowAdapter()
+        {
             @Override
-            public void windowClosing(WindowEvent e) {
-                getExitDialog(0);
+            public void windowClosing(WindowEvent e)
+            {
+                if (exitWindow.createExitDialogAndGetAnswer()) {
+                    System.exit(0);
+                }
             }
         });
+    }
+
+    private ExitWindow createExitWindow()
+    {
+        var exitWindowTitle = bundle.getString("exitDialogTitle");
+        var exitWindowDialog =  bundle.getString("exitDialog");
+        String[] exitWindowOptions = {
+                bundle.getString("exitDialogItemFirst"),
+                bundle.getString("exitDialogItemSecond")
+        };
+        return new ExitWindow(exitWindowTitle, exitWindowDialog, exitWindowOptions);
     }
     
     private LogWindow createLogWindow()
@@ -50,7 +66,7 @@ public class MainApplicationFrame extends JFrame
         var startLogMessage = bundle.getString("startLogMessage");
         LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource(), logWindowTitle);
         logWindow.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        logWindow.addInternalFrameListener(getInternalFrameListener(2));
+        logWindow.addInternalFrameListener(getInternalFrameListener(logWindow));
         logWindow.setLocation(10,10);
         Logger.debug(startLogMessage);
         return logWindow;
@@ -60,7 +76,8 @@ public class MainApplicationFrame extends JFrame
     {
         var gameWindowTitle = bundle.getString("gameWindowTitle");
         GameWindow gameWindow = new GameWindow(gameWindowTitle);
-        gameWindow.addInternalFrameListener(getInternalFrameListener(1));
+        logWindow.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        gameWindow.addInternalFrameListener(getInternalFrameListener(gameWindow));
         gameWindow.setSize(400, 400);
         return gameWindow;
     }
@@ -145,9 +162,7 @@ public class MainApplicationFrame extends JFrame
                 .setAccessibleDescription(testMenuDescription);
 
         JMenuItem addLogMessageItem = new JMenuItem(logMessageItemText, KeyEvent.VK_S);
-        addLogMessageItem.addActionListener((event) -> {
-            Logger.debug(newLogMessage);
-        });
+        addLogMessageItem.addActionListener((event) -> Logger.debug(newLogMessage));
         testMenu.add(addLogMessageItem);
 
         return testMenu;
@@ -188,34 +203,12 @@ public class MainApplicationFrame extends JFrame
         JMenuItem exit = new JMenuItem(exitMenuTitle);
         exit.setMnemonic(KeyEvent.VK_Q);
         exit.setMaximumSize(new Dimension(exit.getPreferredSize()));
-        exit.addActionListener((event) -> getExitDialog(0));
-        return exit;
-    }
-
-    private void getExitDialog(int id)
-    {
-        String[] options = {
-                bundle.getString("exitDialogItemFirst"),
-                bundle.getString("exitDialogItemSecond")
-        };
-        int n = JOptionPane
-                .showOptionDialog(new JFrame(), bundle.getString("exitDialog"),
-                        bundle.getString("exitDialogTitle"), JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE, null, options,
-                        options[0]);
-        if (n == 0)
-        {
-            new JFrame().setVisible(false);
-            switch (id)
-            {
-                case(0):
-                    System.exit(0);
-                case(1):
-                    gameWindow.removeNotify();
-                case(2):
-                    logWindow.dispose();
+        exit.addActionListener((event) -> {
+            if (exitWindow.createExitDialogAndGetAnswer()) {
+                System.exit(0);
             }
-        }
+        });
+        return exit;
     }
 
     private void updateNames()
@@ -229,6 +222,13 @@ public class MainApplicationFrame extends JFrame
 
         gameWindow.setTitle(bundle.getString("gameWindowTitle"));
         logWindow.setTitle(bundle.getString("logWindowTitle"));
+
+        exitWindow.setTitle(bundle.getString("exitDialogTitle"));
+        exitWindow = new ExitWindow(
+                bundle.getString("exitDialogTitle"),
+                bundle.getString("exitDialog"),
+                new String[]{bundle.getString("exitDialogItemFirst"), bundle.getString("exitDialogItemSecond")
+                });
 
         var exitItem = (JMenuItem)menuBar.getComponent(3);
         exitItem.setText(bundle.getString("exitMenuTitle"));
@@ -256,7 +256,7 @@ public class MainApplicationFrame extends JFrame
         menuBar.getMenu(2).getItem(1).setText(bundle.getString("englishMenuItemTitle"));
     }
 
-    private InternalFrameListener getInternalFrameListener(int id)
+    private InternalFrameListener getInternalFrameListener(JInternalFrame frame)
     {
         return new InternalFrameListener() {
             @Override
@@ -265,7 +265,9 @@ public class MainApplicationFrame extends JFrame
             @Override
             public void internalFrameClosing(InternalFrameEvent internalFrameEvent)
             {
-                getExitDialog(id);
+                if (exitWindow.createExitDialogAndGetAnswer()) {
+                    frame.dispose();
+                }
             }
 
             @Override
