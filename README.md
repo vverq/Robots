@@ -11,5 +11,9 @@ ___
 * [X] add closing dialog
 * [X] add exit botton
 * [X] create localization (using ResourceBundle)
+___
+* [ ] remember states windows apps
+* [ ] restore states windows apps
+* [ ] create saved state warning
 
 optimize threads? Atomic classes?
