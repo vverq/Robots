@@ -4,6 +4,8 @@ import log.Logger;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import javax.swing.*;
@@ -21,9 +23,11 @@ class MainApplicationFrame extends JFrame
     private GameWindow gameWindow;
     private JMenuBar menuBar;
     private ExitWindow exitWindow;
+    private StatesKeeper keeper;
 
     MainApplicationFrame()
     {
+        keeper = new StatesKeeper(new File("framesProperties.txt"));
         setLocationRelativeTo(null);
         setContentPane(desktopPane);
 
@@ -43,10 +47,20 @@ class MainApplicationFrame extends JFrame
             public void windowClosing(WindowEvent e)
             {
                 if (exitWindow.createExitDialogAndGetAnswer()) {
+                    try
+                    {
+                        keeper.save();
+                    }
+                    catch (IOException ex)
+                    {
+                        System.out.println(ex.toString());
+                    }
                     System.exit(0);
                 }
             }
         });
+
+        keeper.load();
     }
 
     private ExitWindow createExitWindow()
@@ -59,12 +73,12 @@ class MainApplicationFrame extends JFrame
         };
         return new ExitWindow(exitWindowTitle, exitWindowDialog, exitWindowOptions);
     }
-    
+
     private LogWindow createLogWindow()
     {
         var logWindowTitle = bundle.getString("logWindowTitle");
         var startLogMessage = bundle.getString("startLogMessage");
-        LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource(), logWindowTitle);
+        LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource(), logWindowTitle, keeper);
         logWindow.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         logWindow.addInternalFrameListener(getInternalFrameListener(logWindow));
         logWindow.setLocation(10,10);
@@ -75,7 +89,7 @@ class MainApplicationFrame extends JFrame
     private GameWindow createGameWindow()
     {
         var gameWindowTitle = bundle.getString("gameWindowTitle");
-        GameWindow gameWindow = new GameWindow(gameWindowTitle);
+        GameWindow gameWindow = new GameWindow(gameWindowTitle, keeper);
         logWindow.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         gameWindow.addInternalFrameListener(getInternalFrameListener(gameWindow));
         gameWindow.setSize(400, 400);
@@ -205,6 +219,7 @@ class MainApplicationFrame extends JFrame
         exit.setMaximumSize(new Dimension(exit.getPreferredSize()));
         exit.addActionListener((event) -> {
             if (exitWindow.createExitDialogAndGetAnswer()) {
+                this.dispose();
                 System.exit(0);
             }
         });

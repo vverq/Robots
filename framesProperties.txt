@@ -1,0 +1,1 @@
+{"GameWindow":{"LocationY":"183","isClosed":"false","LocationX":"621","Height":"361","isMaximum":"false","Width":"511"},"LogWindow":{"LocationY":"10","isClosed":"false","LocationX":"10","Height":"273","isMaximum":"false","Width":"212"}}
