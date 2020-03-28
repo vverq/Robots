@@ -4,22 +4,24 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.TextArea;
 
-import javax.swing.JInternalFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
 
-public class LogWindow extends JInternalFrame implements LogChangeListener
+public class LogWindow extends RestorableJInternalFrame implements LogChangeListener
 {
     private LogWindowSource m_logSource;
     private TextArea m_logContent;
+    private StatesKeeper m_keeper;
 
-    LogWindow(LogWindowSource logSource, String title)
+    LogWindow(LogWindowSource logSource, String title, StatesKeeper keeper)
     {
         super(title, true, true, true, true);
         m_logSource = logSource;
+        m_keeper = keeper;
+        m_keeper.register(this, "LogWindow");
         m_logSource.registerListener(this);
         m_logContent = new TextArea("");
         m_logContent.setSize(200, 500);
@@ -35,7 +37,9 @@ public class LogWindow extends JInternalFrame implements LogChangeListener
     public void dispose()
     {
         m_logSource.unregisterListener(this);
+        m_keeper.unregister(this.getName());
         setVisible(false);
+        remove(this);
     }
 
     private void updateLogContent()
