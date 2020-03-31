@@ -24,7 +24,7 @@ class MainApplicationFrame extends JFrame
     private LogWindow logWindow;
     private GameWindow gameWindow;
     private JMenuBar menuBar;
-    private ExitWindow exitWindow;
+    private DialogWindow exitWindow;
     private StatesKeeper keeper;
 
     MainApplicationFrame()
@@ -49,7 +49,7 @@ class MainApplicationFrame extends JFrame
             @Override
             public void windowClosing(WindowEvent e)
             {
-                if (exitWindow.createExitDialogAndGetAnswer()) {
+                if (exitWindow.createDialogAndGetAnswer()) {
                     try
                     {
                         keeper.save();
@@ -64,15 +64,30 @@ class MainApplicationFrame extends JFrame
         });
         try
         {
-            keeper.load();
+            if (keeper.canLoad()) {
+                var warningWindow = createRestoreWarningWindow();
+                if (warningWindow.createDialogAndGetAnswer()) {
+                    keeper.load();
+                }
+            }
         }
         catch(IOException | ParseException e)
         {
             Logger.error(e.toString());
         }
     }
+    private DialogWindow createRestoreWarningWindow()
+    {
+        var warningDialogTitle = bundle.getString("warningDialogTitle");
+        var warningDialog =  bundle.getString("warningDialog");
+        String[] warningWindowOptions = {
+                bundle.getString("warningDialogItemFirst"),
+                bundle.getString("warningDialogItemSecond")
+        };
+        return new DialogWindow(warningDialogTitle, warningDialog, warningWindowOptions);
+    }
 
-    private ExitWindow createExitWindow()
+    private DialogWindow createExitWindow()
     {
         var exitWindowTitle = bundle.getString("exitDialogTitle");
         var exitWindowDialog =  bundle.getString("exitDialog");
@@ -80,7 +95,7 @@ class MainApplicationFrame extends JFrame
                 bundle.getString("exitDialogItemFirst"),
                 bundle.getString("exitDialogItemSecond")
         };
-        return new ExitWindow(exitWindowTitle, exitWindowDialog, exitWindowOptions);
+        return new DialogWindow(exitWindowTitle, exitWindowDialog, exitWindowOptions);
     }
 
     private LogWindow createLogWindow()
@@ -236,7 +251,7 @@ class MainApplicationFrame extends JFrame
         exit.setMnemonic(KeyEvent.VK_Q);
         exit.setMaximumSize(new Dimension(exit.getPreferredSize()));
         exit.addActionListener((event) -> {
-            if (exitWindow.createExitDialogAndGetAnswer()) {
+            if (exitWindow.createDialogAndGetAnswer()) {
                 this.dispose();
                 System.exit(0);
             }
@@ -256,7 +271,7 @@ class MainApplicationFrame extends JFrame
         gameWindow.setTitle(bundle.getString("gameWindowTitle"));
         logWindow.setTitle(bundle.getString("logWindowTitle"));
         exitWindow.setTitle(bundle.getString("exitDialogTitle"));
-        exitWindow = new ExitWindow(
+        exitWindow = new DialogWindow(
                 bundle.getString("exitDialogTitle"),
                 bundle.getString("exitDialog"),
                 new String[]{bundle.getString("exitDialogItemFirst"), bundle.getString("exitDialogItemSecond")
@@ -293,7 +308,7 @@ class MainApplicationFrame extends JFrame
             @Override
             public void internalFrameClosing(InternalFrameEvent internalFrameEvent)
             {
-                if (exitWindow.createExitDialogAndGetAnswer()) {
+                if (exitWindow.createDialogAndGetAnswer()) {
                     frame.dispose();
                 }
             }

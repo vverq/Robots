@@ -11,6 +11,7 @@ import org.json.simple.parser.ParseException;
 public class StatesKeeper
 {
     private HashMap<String, Restorable> restorableObjects;
+    private JSONObject savedProperties;
     private File storageFile;
 
     StatesKeeper(File storageFile)
@@ -31,6 +32,7 @@ public class StatesKeeper
 
     void save() throws IOException
     {
+        savedProperties = null;
         var fw = new FileWriter(storageFile);
         fw.write(getAllProperties().toJSONString());
         fw.close();
@@ -60,15 +62,39 @@ public class StatesKeeper
         }
     }
 
-    void load() throws ParseException, IOException
-    {
+    JSONObject getPropertiesFromFile() throws IOException, ParseException {
         if (storageFile.length() == 0) {
-            return;
+            return null;
         }
         var parser = new JSONParser();
         var parsedFile = new Object();
         parsedFile = parser.parse(new FileReader(storageFile));
         JSONObject properties = (JSONObject) parsedFile;
+        return properties;
+    }
+
+    boolean canLoad()
+    {
+        try {
+            if (savedProperties == null) {
+                savedProperties = getPropertiesFromFile();
+                return savedProperties != null;
+            }
+            else
+                return true;
+        }
+        catch (Exception ex) {
+            return false;
+        }
+    }
+
+    void load() throws ParseException, IOException
+    {
+        JSONObject properties;
+        if (savedProperties == null) {
+            savedProperties = getPropertiesFromFile();
+        }
+        properties = savedProperties;
         setAllProperties(properties);
     }
 }

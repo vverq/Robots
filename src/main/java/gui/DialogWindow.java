@@ -3,25 +3,25 @@ package gui;
 import javax.swing.*;
 
 
-class ExitWindow extends JFrame
+class DialogWindow extends JFrame
 {
     private String[] options;
-    private String exitDialogString;
+    private String dialogString;
 
-    ExitWindow(String title, String exitDialogString, String[] options)
+    DialogWindow(String title, String dialogString, String[] options)
     {
         setTitle(title);
-        this.exitDialogString = exitDialogString;
+        this.dialogString = dialogString;
         this.options = options;
         setVisible(false);
         setLocationRelativeTo(null);
         pack();
     }
 
-    boolean createExitDialogAndGetAnswer()
+    boolean createDialogAndGetAnswer()
     {
         int answerID = JOptionPane
-                .showOptionDialog(this, this.exitDialogString,
+                .showOptionDialog(this, this.dialogString,
                         this.getTitle(), JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE, null, this.options,
                         this.options[0]);
