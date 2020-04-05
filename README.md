@@ -16,10 +16,4 @@ ___
 * [X] restore states windows apps
 * [X] create saved state warning
 
-
-
-
-
-
-
 optimize threads? Atomic classes?
