@@ -1,12 +1,16 @@
 package gui;
 
 import log.Logger;
+import org.json.simple.parser.ParseException;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import javax.swing.*;
+import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
@@ -20,17 +24,22 @@ class MainApplicationFrame extends JFrame
     private LogWindow logWindow;
     private GameWindow gameWindow;
     private JMenuBar menuBar;
-    private ExitWindow exitWindow;
+    private DialogWindow exitWindow;
+    private DialogWindow warningWindow;
+    private StatesKeeper keeper;
 
     MainApplicationFrame()
     {
+        keeper = new StatesKeeper(new File("framesProperties.json"));
         setLocationRelativeTo(null);
         setContentPane(desktopPane);
+        setMinimumSize(new Dimension(750,600));
 
         menuBar = generateMenuBar();
         logWindow = createLogWindow();
         gameWindow = createGameWindow();
         exitWindow = createExitWindow();
+        warningWindow = createRestoreWarningWindow();
 
         setJMenuBar(menuBar);
         addWindow(logWindow);
@@ -42,14 +51,44 @@ class MainApplicationFrame extends JFrame
             @Override
             public void windowClosing(WindowEvent e)
             {
-                if (exitWindow.createExitDialogAndGetAnswer()) {
+                if (exitWindow.createDialogAndGetAnswer()) {
+                    try
+                    {
+                        keeper.save();
+                    }
+                    catch (IOException ex)
+                    {
+                        System.out.println(ex.toString());
+                    }
                     System.exit(0);
                 }
             }
         });
+        try
+        {
+            if (keeper.canLoad()) {
+                if (warningWindow.createDialogAndGetAnswer()) {
+                    keeper.load();
+                }
+            }
+        }
+        catch(IOException | ParseException e)
+        {
+            Logger.error(e.toString());
+        }
+    }
+    private DialogWindow createRestoreWarningWindow()
+    {
+        var warningDialogTitle = bundle.getString("warningDialogTitle");
+        var warningDialog =  bundle.getString("warningDialog");
+        String[] warningWindowOptions = {
+                bundle.getString("warningDialogItemFirst"),
+                bundle.getString("warningDialogItemSecond")
+        };
+        return new DialogWindow(warningDialogTitle, warningDialog, warningWindowOptions);
     }
 
-    private ExitWindow createExitWindow()
+    private DialogWindow createExitWindow()
     {
         var exitWindowTitle = bundle.getString("exitDialogTitle");
         var exitWindowDialog =  bundle.getString("exitDialog");
@@ -57,14 +96,14 @@ class MainApplicationFrame extends JFrame
                 bundle.getString("exitDialogItemFirst"),
                 bundle.getString("exitDialogItemSecond")
         };
-        return new ExitWindow(exitWindowTitle, exitWindowDialog, exitWindowOptions);
+        return new DialogWindow(exitWindowTitle, exitWindowDialog, exitWindowOptions);
     }
-    
+
     private LogWindow createLogWindow()
     {
         var logWindowTitle = bundle.getString("logWindowTitle");
         var startLogMessage = bundle.getString("startLogMessage");
-        LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource(), logWindowTitle);
+        LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource(), logWindowTitle, keeper);
         logWindow.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         logWindow.addInternalFrameListener(getInternalFrameListener(logWindow));
         logWindow.setLocation(10,10);
@@ -75,10 +114,19 @@ class MainApplicationFrame extends JFrame
     private GameWindow createGameWindow()
     {
         var gameWindowTitle = bundle.getString("gameWindowTitle");
-        GameWindow gameWindow = new GameWindow(gameWindowTitle);
-        logWindow.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        gameWindow.addInternalFrameListener(getInternalFrameListener(gameWindow));
-        gameWindow.setSize(400, 400);
+        try
+        {
+            GameWindow gameWindow = new GameWindow(gameWindowTitle, keeper);
+            logWindow.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+            gameWindow.addInternalFrameListener(getInternalFrameListener(gameWindow));
+            gameWindow.setLocation(300, 50);
+            gameWindow.setSize(400, 400);
+            return gameWindow;
+        }
+        catch (IOException e)
+        {
+            Logger.error(e.toString());
+        }
         return gameWindow;
     }
 
@@ -182,19 +230,38 @@ class MainApplicationFrame extends JFrame
 
         JMenuItem russianItem = new JMenuItem(russianMenuItemTitle, KeyEvent.VK_S);
         russianItem.addActionListener((event) -> {
-            locale = Locale.getDefault();
-            updateNames();
+            updateNames(Locale.getDefault());
         });
         languageMenu.add(russianItem);
 
         JMenuItem englishItem = new JMenuItem(englishMenuItemTitle, KeyEvent.VK_S);
         englishItem.addActionListener((event) -> {
-            locale = Locale.ENGLISH;
-            updateNames();
+            updateNames(Locale.ENGLISH);
         });
         languageMenu.add(englishItem);
 
         return languageMenu;
+    }
+
+    private void updateNames(Locale locale)
+    {
+        updateMenu(locale);
+        gameWindow.updateNames(locale);
+        logWindow.updateNames(locale);
+        warningWindow.updateDialog(locale,
+                "warningDialogTitle",
+                "warningDialog",
+                new String[]{
+                        "warningDialogItemFirst",
+                        "warningDialogItemSecond"
+                });
+        exitWindow.updateDialog(locale,
+                "exitDialogTitle",
+                "exitDialog",
+                new String[]{
+                        "exitDialogItemFirst",
+                        "exitDialogItemSecond"
+                });
     }
 
     private JMenuItem createExitMenuItem()
@@ -204,14 +271,15 @@ class MainApplicationFrame extends JFrame
         exit.setMnemonic(KeyEvent.VK_Q);
         exit.setMaximumSize(new Dimension(exit.getPreferredSize()));
         exit.addActionListener((event) -> {
-            if (exitWindow.createExitDialogAndGetAnswer()) {
+            if (exitWindow.createDialogAndGetAnswer()) {
+                this.dispose();
                 System.exit(0);
             }
         });
         return exit;
     }
 
-    private void updateNames()
+    private void updateMenu(Locale locale)
     {
         bundle = ResourceBundle.getBundle("MainApplicationFrameBundle", locale);
         setLocale(locale);
@@ -219,20 +287,9 @@ class MainApplicationFrame extends JFrame
         updateVisualModeMenu(menuBar);
         updateTestMenu(menuBar);
         updateLanguageMenu(menuBar);
-
-        gameWindow.setTitle(bundle.getString("gameWindowTitle"));
-        logWindow.setTitle(bundle.getString("logWindowTitle"));
-
-        exitWindow.setTitle(bundle.getString("exitDialogTitle"));
-        exitWindow = new ExitWindow(
-                bundle.getString("exitDialogTitle"),
-                bundle.getString("exitDialog"),
-                new String[]{bundle.getString("exitDialogItemFirst"), bundle.getString("exitDialogItemSecond")
-                });
-
+        
         var exitItem = (JMenuItem)menuBar.getComponent(3);
         exitItem.setText(bundle.getString("exitMenuTitle"));
-
         SwingUtilities.updateComponentTreeUI(this);
     }
 
@@ -258,32 +315,14 @@ class MainApplicationFrame extends JFrame
 
     private InternalFrameListener getInternalFrameListener(JInternalFrame frame)
     {
-        return new InternalFrameListener() {
-            @Override
-            public void internalFrameOpened(InternalFrameEvent internalFrameEvent) { }
-
+        return new InternalFrameAdapter() {
             @Override
             public void internalFrameClosing(InternalFrameEvent internalFrameEvent)
             {
-                if (exitWindow.createExitDialogAndGetAnswer()) {
+                if (exitWindow.createDialogAndGetAnswer()) {
                     frame.dispose();
                 }
             }
-
-            @Override
-            public void internalFrameClosed(InternalFrameEvent internalFrameEvent) {}
-
-            @Override
-            public void internalFrameIconified(InternalFrameEvent internalFrameEvent) {}
-
-            @Override
-            public void internalFrameDeiconified(InternalFrameEvent internalFrameEvent) {}
-
-            @Override
-            public void internalFrameActivated(InternalFrameEvent internalFrameEvent) {}
-
-            @Override
-            public void internalFrameDeactivated(InternalFrameEvent internalFrameEvent) {}
         };
     }
 }
