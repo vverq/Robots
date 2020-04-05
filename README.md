@@ -14,6 +14,12 @@ ___
 ___
 * [X] remember states windows apps
 * [X] restore states windows apps
-* [ ] create saved state warning
+* [X] create saved state warning
+
+
+
+
+
+
 
 optimize threads? Atomic classes?

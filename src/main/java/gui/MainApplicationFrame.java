@@ -25,6 +25,7 @@ class MainApplicationFrame extends JFrame
     private GameWindow gameWindow;
     private JMenuBar menuBar;
     private DialogWindow exitWindow;
+    private DialogWindow warningWindow;
     private StatesKeeper keeper;
 
     MainApplicationFrame()
@@ -38,6 +39,7 @@ class MainApplicationFrame extends JFrame
         logWindow = createLogWindow();
         gameWindow = createGameWindow();
         exitWindow = createExitWindow();
+        warningWindow = createRestoreWarningWindow();
 
         setJMenuBar(menuBar);
         addWindow(logWindow);
@@ -65,7 +67,6 @@ class MainApplicationFrame extends JFrame
         try
         {
             if (keeper.canLoad()) {
-                var warningWindow = createRestoreWarningWindow();
                 if (warningWindow.createDialogAndGetAnswer()) {
                     keeper.load();
                 }
@@ -229,19 +230,38 @@ class MainApplicationFrame extends JFrame
 
         JMenuItem russianItem = new JMenuItem(russianMenuItemTitle, KeyEvent.VK_S);
         russianItem.addActionListener((event) -> {
-            locale = Locale.getDefault();
-            updateNames();
+            updateNames(Locale.getDefault());
         });
         languageMenu.add(russianItem);
 
         JMenuItem englishItem = new JMenuItem(englishMenuItemTitle, KeyEvent.VK_S);
         englishItem.addActionListener((event) -> {
-            locale = Locale.ENGLISH;
-            updateNames();
+            updateNames(Locale.ENGLISH);
         });
         languageMenu.add(englishItem);
 
         return languageMenu;
+    }
+
+    private void updateNames(Locale locale)
+    {
+        updateMenu(locale);
+        gameWindow.updateNames(locale);
+        logWindow.updateNames(locale);
+        warningWindow.updateDialog(locale,
+                "warningDialogTitle",
+                "warningDialog",
+                new String[]{
+                        "warningDialogItemFirst",
+                        "warningDialogItemSecond"
+                });
+        exitWindow.updateDialog(locale,
+                "exitDialogTitle",
+                "exitDialog",
+                new String[]{
+                        "exitDialogItemFirst",
+                        "exitDialogItemSecond"
+                });
     }
 
     private JMenuItem createExitMenuItem()
@@ -259,7 +279,7 @@ class MainApplicationFrame extends JFrame
         return exit;
     }
 
-    private void updateNames()
+    private void updateMenu(Locale locale)
     {
         bundle = ResourceBundle.getBundle("MainApplicationFrameBundle", locale);
         setLocale(locale);
@@ -267,16 +287,7 @@ class MainApplicationFrame extends JFrame
         updateVisualModeMenu(menuBar);
         updateTestMenu(menuBar);
         updateLanguageMenu(menuBar);
-
-        gameWindow.setTitle(bundle.getString("gameWindowTitle"));
-        logWindow.setTitle(bundle.getString("logWindowTitle"));
-        exitWindow.setTitle(bundle.getString("exitDialogTitle"));
-        exitWindow = new DialogWindow(
-                bundle.getString("exitDialogTitle"),
-                bundle.getString("exitDialog"),
-                new String[]{bundle.getString("exitDialogItemFirst"), bundle.getString("exitDialogItemSecond")
-                });
-
+        
         var exitItem = (JMenuItem)menuBar.getComponent(3);
         exitItem.setText(bundle.getString("exitMenuTitle"));
         SwingUtilities.updateComponentTreeUI(this);

@@ -2,6 +2,8 @@ package gui;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.swing.*;
 
@@ -24,9 +26,17 @@ public class GameWindow extends RestorableJInternalFrame
         pack();
     }
 
-    public void dispose() {
+    public void dispose()
+    {
         setVisible(false);
         m_keeper.unregister(this.getName());
-        remove(this);
+        super.dispose();
+    }
+
+    public void updateNames(Locale locale)
+    {
+        var bundle = ResourceBundle.getBundle("MainApplicationFrameBundle", locale);
+        setLocale(locale);
+        setTitle(bundle.getString("gameWindowTitle"));
     }
 }

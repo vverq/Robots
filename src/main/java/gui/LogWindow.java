@@ -3,6 +3,8 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.TextArea;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.swing.*;
 
@@ -39,7 +41,14 @@ public class LogWindow extends RestorableJInternalFrame implements LogChangeList
         m_logSource.unregisterListener(this);
         m_keeper.unregister(this.getName());
         setVisible(false);
-        remove(this);
+        super.dispose();
+    }
+
+    public void updateNames(Locale locale)
+    {
+        var bundle = ResourceBundle.getBundle("MainApplicationFrameBundle", locale);
+        setLocale(locale);
+        setTitle(bundle.getString("logWindowTitle"));
     }
 
     private void updateLogContent()
