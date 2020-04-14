@@ -4,18 +4,34 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 public class Target
 {
     private volatile int m_targetPositionX;
     private volatile int m_targetPositionY;
     private volatile Image m_targetImage;
+    private final HashMap<Integer, String> images = new HashMap<>();
+    {
+        images.put(0,"images/cake.png");
+        images.put(1, "images/cherry.png");
+        images.put(2, "images/pancake.png");
+        images.put(3, "images/ramen.png");
+        images.put(4, "images/yogurt.png");
+    }
 
-    public Target(int x, int y, String imageName) throws IOException
+    public Target(int x, int y, int num)
     {
         m_targetPositionX = x;
         m_targetPositionY = y;
-        m_targetImage = ImageIO.read(new File(imageName));
+        try
+        {
+            m_targetImage = ImageIO.read(new File(images.get(num)));
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public int getM_targetPositionX()
