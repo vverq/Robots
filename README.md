@@ -16,11 +16,10 @@ ___
 * [X] restore states windows apps
 * [X] create saved state warning
 ___
-* [ ] add some kinds of target and fix their behavior
+* [X] add some kinds of target and fix their behavior
 * [ ] add push-botton control of the robot
-* [ ] teach robot to eat targets
-* [ ] create an enemy
-
+* [X] teach robot to eat targets
+* [ ] create a barrier
 
 
 
