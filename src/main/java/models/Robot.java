@@ -10,18 +10,20 @@ public class Robot
     private volatile double m_robotPositionX;
     private volatile double m_robotPositionY;
     private volatile double m_robotDirection;
-    private volatile double m_robotDiam1 = 30;
-    private volatile double m_robotDiam2 = 30;
+    private volatile double m_robotDiam1;
+    private volatile double m_robotDiam2;
     private volatile Image m_robotImage;
 
-    public Robot(double x, double y, double direcion, String imageName)
+    public Robot(double x, double y, double direction, String imageName)
     {
         try
         {
             m_robotPositionX = x;
             m_robotPositionY = y;
-            m_robotDirection = direcion;
+            m_robotDirection = direction;
             m_robotImage = ImageIO.read(new File(imageName));
+            m_robotDiam1 = m_robotImage.getWidth(null);
+            m_robotDiam2 = m_robotImage.getHeight(null);
         }
         catch (IOException e)
         {

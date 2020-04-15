@@ -11,6 +11,9 @@ public class Target
     private volatile int m_targetPositionX;
     private volatile int m_targetPositionY;
     private volatile Image m_targetImage;
+    private volatile int m_targetWidth = 20;
+    private volatile int m_targetHeight = 20;
+
     private final HashMap<Integer, String> images = new HashMap<>();
     {
         images.put(0,"images/cake.png");
@@ -58,4 +61,8 @@ public class Target
     {
         return m_targetImage;
     }
+
+    public int getM_targetWidth() { return m_targetWidth; }
+
+    public int getM_targetHeight() { return m_targetHeight; }
 }

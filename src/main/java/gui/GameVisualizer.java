@@ -4,8 +4,7 @@ import models.Target;
 import models.Robot;
 
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -34,10 +33,10 @@ public class GameVisualizer extends JPanel
 
     private Robot robot = new Robot(100, 100, 0, "images/robot.png");
     private ConcurrentLinkedDeque<Target> targets = new ConcurrentLinkedDeque<>();
-    private int countTargets = 3;
+    private int maxCountTargets = 5;
 
-    private static final double maxVelocity = 0.1;
-    private static final double maxAngularVelocity = 0.01;
+    private static final double maxVelocity = 5;
+//    private static final double maxAngularVelocity = 0.01;
 
     GameVisualizer()
     {
@@ -56,15 +55,15 @@ public class GameVisualizer extends JPanel
             {
                 onTargetUpdateEvent();
             }
-        }, 0, 10);
-        m_timer.schedule(new TimerTask()
-        {
-            @Override
-            public void run()
-            {
-                onModelUpdateEvent();
-            }
-        }, 0, 10);
+        }, 0, 1000);
+//        m_timer.schedule(new TimerTask()
+//        {
+//            @Override
+//            public void run()
+//            {
+//                onModelUpdateEvent();
+//            }
+//        }, 0, 10);
 //        addMouseListener(new MouseAdapter()
 //        {
 //            @Override
@@ -74,13 +73,70 @@ public class GameVisualizer extends JPanel
 //                repaint();
 //            }
 //        });
+        var visualizer = this;
+        this.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent keyEvent) {
+                visualizer.processKeyEvent(keyEvent);
+            }
+        });
+        setFocusable(true);
         setDoubleBuffered(true);
+    }
+
+    enum Direction {
+        UP,
+        DOWN,
+        RIGHT,
+        LEFT
+    }
+
+    protected void processKeyEvent(KeyEvent keyEvent) {
+        switch (keyEvent.getKeyCode()) {
+            case KeyEvent.VK_DOWN:
+                setRobotDirection(Direction.DOWN);
+                moveRobot(maxVelocity, Direction.DOWN);
+                break;
+            case KeyEvent.VK_UP:
+                setRobotDirection(Direction.UP);
+                moveRobot(maxVelocity, Direction.UP);
+                break;
+            case KeyEvent.VK_RIGHT:
+                setRobotDirection(Direction.RIGHT);
+                moveRobot(maxVelocity, Direction.RIGHT);
+                break;
+            case KeyEvent.VK_LEFT:
+                setRobotDirection(Direction.LEFT);
+                moveRobot(maxVelocity, Direction.LEFT);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void setRobotDirection(Direction direction) {
+        switch (direction) {
+            case DOWN:
+                robot.setM_robotDirection(Math.toRadians(180));
+                break;
+            case UP:
+                robot.setM_robotDirection(Math.toRadians(0));
+                break;
+            case RIGHT:
+                robot.setM_robotDirection(Math.toRadians(90));
+                break;
+            case LEFT:
+                robot.setM_robotDirection(Math.toRadians(270));
+                break;
+            default:
+                break;
+        }
     }
 
     private void onTargetUpdateEvent()
     {
-        while (targets.size() < countTargets)
-        {
+        var countNewTargets = rnd.nextInt(maxCountTargets - targets.size() + 1);
+        for (var i = 0; i < countNewTargets; i++) {
             targets.addLast(new Target(rnd.nextInt(350), rnd.nextInt(350), rnd.nextInt(5)));
         }
     }
@@ -105,7 +161,7 @@ public class GameVisualizer extends JPanel
         return asNormalizedRadians(Math.atan2(diffY, diffX));
     }
 
-    private void onModelUpdateEvent()
+    /*private void onModelUpdateEvent()
     {
         var target = targets.getFirst();
         double distance = distance(target.getM_targetPositionX(), target.getM_targetPositionY(),
@@ -130,14 +186,50 @@ public class GameVisualizer extends JPanel
             angularVelocity = -maxAngularVelocity;
         }
         moveRobot(maxVelocity, angularVelocity, 10, target);
-    }
+    }*/
 
     private static double applyLimits(double value, double min, double max)
     {
         return Math.min(max, Math.max(value,min));
     }
 
-    private void moveRobot(double velocity, double angularVelocity, double duration, Target target)
+    private void moveRobot(double velocity, Direction direction) {
+        double xValue = robot.getM_robotPositionX();
+        double yValue = robot.getM_robotPositionY();
+        switch(direction) {
+            case UP:
+                yValue -= velocity;
+                break;
+            case DOWN:
+                yValue += velocity;
+                break;
+            case RIGHT:
+                xValue += velocity;
+                break;
+            case LEFT:
+                xValue -= velocity;
+                break;
+        }
+        robot.setM_robotPositionX(applyLimits(
+                xValue,
+                Math.max(robot.getM_robotDiam1(), robot.getM_robotDiam2()) / 2,
+                this.getWidth() - (Math.max(robot.getM_robotDiam1(), robot.getM_robotDiam2()) / 2))
+        );
+        robot.setM_robotPositionY(applyLimits(
+                yValue,
+                Math.max(robot.getM_robotDiam1(), robot.getM_robotDiam2()) / 2,
+                this.getHeight() - (Math.max(robot.getM_robotDiam1(), robot.getM_robotDiam2()) / 2))
+        );
+        for (Target targetForEat: targets)
+        {
+            if (isRobotNearToTarget(targetForEat))
+            {
+                targets.remove(targetForEat);
+            }
+        }
+    }
+
+    /*private void moveRobot(double velocity, double angularVelocity, double duration, Target target)
     {
         velocity = applyLimits(velocity, 0, maxVelocity);
         angularVelocity = applyLimits(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
@@ -170,12 +262,22 @@ public class GameVisualizer extends JPanel
         }
         for (Target targetForEat: targets)
         {
-            if (round(robot.getM_robotPositionX()) == targetForEat.getM_targetPositionX()
-                     && round(robot.getM_robotPositionY()) == targetForEat.getM_targetPositionY())
+            if (isRobotNearToTarget(targetForEat))
             {
                 targets.remove(targetForEat);
             }
         }
+    }*/
+
+    private boolean isRobotNearToTarget(Target targetForEat) {
+        var targetX = targetForEat.getM_targetPositionX();
+        var targetY = targetForEat.getM_targetPositionY();
+        var robotX = round(robot.getM_robotPositionX());
+        var robotY = round(robot.getM_robotPositionY());
+        var robotDiam1 = robot.getM_robotDiam1();
+        var robotDiam2 = robot.getM_robotDiam2();
+        return targetX <= robotX + robotDiam1 / 2 && targetX >= robotX - robotDiam1 / 2
+                && targetY <= robotY + robotDiam2 / 2 && targetY >= robotY - robotDiam2 / 2;
     }
 
     private static double asNormalizedRadians(double angle)
@@ -217,7 +319,8 @@ public class GameVisualizer extends JPanel
         int robotCenterY = round(robot.getM_robotPositionY());
         AffineTransform t = AffineTransform.getRotateInstance(direction, robotCenterX, robotCenterY);
         g.setTransform(t);
-        g.drawImage(robotImage, robotCenterX, robotCenterY, null);
+        g.drawImage(robotImage, robotCenterX - robotImage.getHeight(null) / 2,
+                robotCenterY - robotImage.getWidth(null) / 2, null);
     }
 
     private void drawTarget(Graphics2D g, ConcurrentLinkedDeque<Target> targets)
