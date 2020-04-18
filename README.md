@@ -19,7 +19,7 @@ ___
 * [X] add some kinds of target and fix their behavior
 * [X] add push-botton control of the robot
 * [X] teach robot to eat targets
-* [ ] create a barrier
+* [X] create a barrier
 
 
 
