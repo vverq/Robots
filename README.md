@@ -17,7 +17,7 @@ ___
 * [X] create saved state warning
 ___
 * [X] add some kinds of target and fix their behavior
-* [ ] add push-botton control of the robot
+* [X] add push-botton control of the robot
 * [X] teach robot to eat targets
 * [ ] create a barrier
 
