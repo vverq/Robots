@@ -14,22 +14,13 @@ public class Target
     private volatile int m_targetWidth = 20;
     private volatile int m_targetHeight = 20;
 
-    private final HashMap<Integer, String> images = new HashMap<>();
-    {
-        images.put(0,"images/cake.png");
-        images.put(1, "images/cherry.png");
-        images.put(2, "images/pancake.png");
-        images.put(3, "images/ramen.png");
-        images.put(4, "images/yogurt.png");
-    }
-
-    public Target(int x, int y, int num)
+    public Target(int x, int y, String imageName)
     {
         m_targetPositionX = x;
         m_targetPositionY = y;
         try
         {
-            m_targetImage = ImageIO.read(new File(images.get(num)));
+            m_targetImage = ImageIO.read(new File(imageName));
         }
         catch (IOException e)
         {

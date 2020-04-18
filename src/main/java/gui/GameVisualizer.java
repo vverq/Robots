@@ -2,6 +2,9 @@ package gui;
 
 import models.Target;
 import models.Robot;
+import models.Barrier;
+import models.Floor;
+import models.LevelMap;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -10,19 +13,16 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import javax.swing.JPanel;
 
+
+// TODO: разделить логику и отрисовку
+// TODO: вернуть прежний функционал тоже (например, можно создать такое же окошко, как диалоговое окно, которое
+//  которое спрашивает, хочет ли пользователь восстановить состояние, только это новое окошко будет спрашивать
+//  включить ли автоматический режим у котика или нет, если да, то пусть работает прежний функционал, иначе --
+//  -- управление кнопочками
+
+
 public class GameVisualizer extends JPanel
 {
-
-    //TODO:  то, что осталось сделать:
-    // 1) запретить роботу-коту бегать вниз головой, это крипово
-    // 2) придумать что-то с countTargets, чтобы этот параметр постоянной варьировался в какой-то дельте
-    // например, после съедания очередной цели рандомно определяется операция: либо новой цели не добавлять,
-    // либо добавить одну, либо добавить несколько (но следить, чтобы кол-во несъеденных целей было разумно)
-    // 3) добавить возможность взаимодействовать с роботом-котом кнопками
-    // ps после кнопок робот-кот должен вроде нормально взаимодействовать с таргетами, тк в кач-ве координат первого
-    // сейчас его правое ухо и поэтому он так криво ест, а еще он иногда все же убегает за границу и там прячется
-
-
     private Random rnd = new Random();
     private final Timer m_timer = initTimer();
     private static Timer initTimer()
@@ -30,10 +30,20 @@ public class GameVisualizer extends JPanel
         Timer timer = new Timer("events generator", true);
         return timer;
     }
-
-    private Robot robot = new Robot(100, 100, 0, "images/robot.png");
+    private Robot robot = new Robot(200, 200, 0, "images/robot.png");
+    private LevelMap map = new LevelMap("map1.txt");
+    private ConcurrentLinkedDeque<Barrier> barrierMap = map.getBarrierMap();
+    private ConcurrentLinkedDeque<Floor> floorMap = map.getFloorMap();
     private ConcurrentLinkedDeque<Target> targets = new ConcurrentLinkedDeque<>();
-    private int maxCountTargets = 5;
+
+    private final HashMap<Integer, String> targetImages = new HashMap<>();
+    {
+        targetImages.put(0,"images/cake.png");
+        targetImages.put(1, "images/cherry.png");
+        targetImages.put(2, "images/pancake.png");
+        targetImages.put(3, "images/ramen.png");
+        targetImages.put(4, "images/yogurt.png");
+    }
 
     private static final double maxVelocity = 5;
 //    private static final double maxAngularVelocity = 0.01;
@@ -84,6 +94,22 @@ public class GameVisualizer extends JPanel
         setDoubleBuffered(true);
     }
 
+    private void onTargetUpdateEvent()
+    {
+        int maxCountTargets = 5;
+        int countNewTargets = rnd.nextInt(maxCountTargets - targets.size() + 1);
+        for (var i = 0; i < countNewTargets; i++) {
+            var x = rnd.nextInt(350);
+            var y = rnd.nextInt(350);
+            while (!isCorrect(x + 25, y + 25))
+            {
+                x = rnd.nextInt(350);
+                y = rnd.nextInt(350);
+            }
+            targets.addLast(new Target(x, y, targetImages.get(rnd.nextInt(5))));
+        }
+    }
+
     enum Direction {
         UP,
         DOWN,
@@ -120,24 +146,12 @@ public class GameVisualizer extends JPanel
                 robot.setM_robotDirection(Math.toRadians(180));
                 break;
             case UP:
-                robot.setM_robotDirection(Math.toRadians(0));
-                break;
             case RIGHT:
-                robot.setM_robotDirection(Math.toRadians(90));
-                break;
             case LEFT:
-                robot.setM_robotDirection(Math.toRadians(270));
+                robot.setM_robotDirection(Math.toRadians(0));
                 break;
             default:
                 break;
-        }
-    }
-
-    private void onTargetUpdateEvent()
-    {
-        var countNewTargets = rnd.nextInt(maxCountTargets - targets.size() + 1);
-        for (var i = 0; i < countNewTargets; i++) {
-            targets.addLast(new Target(rnd.nextInt(350), rnd.nextInt(350), rnd.nextInt(5)));
         }
     }
 
@@ -161,36 +175,54 @@ public class GameVisualizer extends JPanel
         return asNormalizedRadians(Math.atan2(diffY, diffX));
     }
 
-    /*private void onModelUpdateEvent()
-    {
-        var target = targets.getFirst();
-        double distance = distance(target.getM_targetPositionX(), target.getM_targetPositionY(),
-                robot.getM_robotPositionX(), robot.getM_robotPositionY());
-        if (distance < 0.5)
-        {
-            return;
-        }
-        double angleToTarget = angleTo(
-                robot.getM_robotPositionX(),
-                robot.getM_robotPositionY(),
-                target.getM_targetPositionX(),
-                target.getM_targetPositionY()
-        );
-        double angularVelocity = 0;
-        if (angleToTarget > robot.getM_robotDirection())
-        {
-            angularVelocity = maxAngularVelocity;
-        }
-        if (angleToTarget < robot.getM_robotDirection())
-        {
-            angularVelocity = -maxAngularVelocity;
-        }
-        moveRobot(maxVelocity, angularVelocity, 10, target);
-    }*/
+//    private void onModelUpdateEvent()
+//    {
+//        var target = targets.getFirst();
+//        double distance = distance(target.getM_targetPositionX(), target.getM_targetPositionY(),
+//                robot.getM_robotPositionX(), robot.getM_robotPositionY());
+//        if (distance < 0.5)
+//        {
+//            return;
+//        }
+//        double angleToTarget = angleTo(
+//                robot.getM_robotPositionX(),
+//                robot.getM_robotPositionY(),
+//                target.getM_targetPositionX(),
+//                target.getM_targetPositionY()
+//        );
+//        double angularVelocity = 0;
+//        if (angleToTarget > robot.getM_robotDirection())
+//        {
+//            angularVelocity = maxAngularVelocity;
+//        }
+//        if (angleToTarget < robot.getM_robotDirection())
+//        {
+//            angularVelocity = -maxAngularVelocity;
+//        }
+//        moveRobot(maxVelocity, angularVelocity, 10, target);
+//    }
 
     private static double applyLimits(double value, double min, double max)
     {
         return Math.min(max, Math.max(value,min));
+    }
+
+    private boolean isCorrect(int x, int y)
+    {
+        for (Barrier barrier: barrierMap)
+        {
+            int barrierX = barrier.getM_barrierPositionX() * barrier.getM_berrierWidth();
+            int barrierY = barrier.getM_barrierPositionY() * barrier.getM_barrierHeight();
+
+            if (barrierX <= x
+                    && barrierX + barrier.getM_berrierWidth() >= x
+                    && barrierY <=  y
+                    && barrierY + barrier.getM_barrierHeight() >= y)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void moveRobot(double velocity, Direction direction) {
@@ -198,16 +230,20 @@ public class GameVisualizer extends JPanel
         double yValue = robot.getM_robotPositionY();
         switch(direction) {
             case UP:
-                yValue -= velocity;
+                if (isCorrect(round(xValue), round(yValue - velocity)))
+                    yValue -= velocity;
                 break;
             case DOWN:
-                yValue += velocity;
+                if (isCorrect(round(xValue), round(yValue + velocity)))
+                    yValue += velocity;
                 break;
             case RIGHT:
-                xValue += velocity;
+                if (isCorrect(round(xValue + velocity), round(yValue)))
+                    xValue += velocity;
                 break;
             case LEFT:
-                xValue -= velocity;
+                if (isCorrect(round(xValue - velocity), round(yValue)))
+                    xValue -= velocity;
                 break;
         }
         robot.setM_robotPositionX(applyLimits(
@@ -303,27 +339,50 @@ public class GameVisualizer extends JPanel
     {
         super.paint(g);
         Graphics2D g2d = (Graphics2D)g;
-        drawRobot(
-                g2d,
-                round(robot.getM_robotPositionX()),
-                round(robot.getM_robotPositionY()),
-                robot.getM_robotDirection(),
-                robot.getM_robotImage()
-        );
-        drawTarget(g2d, targets);
+        drawMap(g2d);
+        drawRobot(g2d);
+        drawTarget(g2d);
     }
 
-    private void drawRobot(Graphics2D g, int x, int y, double direction, Image robotImage)
+    private void drawMap(Graphics2D g)
+    {
+        AffineTransform t = AffineTransform.getRotateInstance(0, 15, 15);
+        g.setTransform(t);
+        for (Barrier barrier: barrierMap)
+        {
+            g.drawImage(
+                    barrier.getM_barrierImage(),
+                    barrier.getM_barrierPositionX() * barrier.getM_berrierWidth(),
+                    barrier.getM_barrierPositionY() * barrier.getM_barrierHeight(),
+                    null
+            );
+        }
+        for (Floor floor: floorMap)
+        {
+            g.drawImage(
+                    floor.getM_floorImage(),
+                    floor.getM_floorPositionX() * floor.getM_floorWidth(),
+                    floor.getM_floorPositionY() * floor.getM_floorHeight(),
+                    null
+            );
+        }
+    }
+
+    private void drawRobot(Graphics2D g)
     {
         int robotCenterX = round(robot.getM_robotPositionX());
         int robotCenterY = round(robot.getM_robotPositionY());
-        AffineTransform t = AffineTransform.getRotateInstance(direction, robotCenterX, robotCenterY);
+        AffineTransform t = AffineTransform.getRotateInstance(robot.getM_robotDirection(), robotCenterX, robotCenterY);
         g.setTransform(t);
-        g.drawImage(robotImage, robotCenterX - robotImage.getHeight(null) / 2,
-                robotCenterY - robotImage.getWidth(null) / 2, null);
+        g.drawImage(
+                robot.getM_robotImage(),
+                robotCenterX - robot.getM_robotImage().getHeight(null) / 2,
+                robotCenterY - robot.getM_robotImage().getWidth(null) / 2,
+                null
+        );
     }
 
-    private void drawTarget(Graphics2D g, ConcurrentLinkedDeque<Target> targets)
+    private void drawTarget(Graphics2D g)
     {
         AffineTransform t = AffineTransform.getRotateInstance(0, 0, 0);
         g.setTransform(t);
