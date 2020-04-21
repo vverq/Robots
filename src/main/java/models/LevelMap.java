@@ -7,14 +7,21 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class LevelMap
 {
-    private ConcurrentLinkedDeque<Barrier> barrierMap = new ConcurrentLinkedDeque<>();
-    private ConcurrentLinkedDeque<Floor> floorMap = new ConcurrentLinkedDeque<>();
+    private int width;
+    private int height;
+    private Block[][] map;
+    public GraphFromMap graph;
 
     public LevelMap(String filename)
     {
         try
         {
             Scanner sc = new Scanner(new File(filename));
+            var strMapSize = sc.nextLine().split(" ");
+            width = Integer.parseInt(strMapSize[0]);
+            height = Integer.parseInt(strMapSize[1]);
+            map = new Block[height][width];
+            graph = new GraphFromMap(this);
             while (sc.hasNext())
             {
                 String str = sc.nextLine();
@@ -25,11 +32,11 @@ public class LevelMap
                     {
                         if (mapElement[0].equals("b"))
                         {
-                            barrierMap.push(new Barrier(x, y, mapElement[1]));
+                            map[y][x] = new Barrier(x, y, mapElement[1]);
                         }
                         else
                         {
-                            floorMap.push(new Floor(x, y, mapElement[1]));
+                            map[y][x] = new Floor(x, y, mapElement[1]);
                         }
                     }
                 }
@@ -40,13 +47,9 @@ public class LevelMap
         }
     }
 
-    public ConcurrentLinkedDeque<Barrier> getBarrierMap()
-    {
-        return barrierMap;
-    }
+    public int getWidth() { return width; }
 
-    public ConcurrentLinkedDeque<Floor> getFloorMap()
-    {
-        return floorMap;
-    }
+    public int getHeight() { return height; }
+
+    public Block[][] getMap() { return map; }
 }

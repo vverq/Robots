@@ -6,13 +6,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
-public class Floor
+public class Floor extends Block
 {
-    private volatile int m_floorPositionX;
-    private volatile int m_floorPositionY;
     private volatile Image m_floorImage;
-    private volatile int m_floorWidth = 40;
-    private volatile int m_floorHeight = 40;
 
     private final HashMap<String, String> images = new HashMap<>();
     {
@@ -22,35 +18,21 @@ public class Floor
 
     Floor(int x, int y, String imageName)
     {
+        super(x, y, true);
         try
         {
-            m_floorPositionX = x;
-            m_floorPositionY = y;
             m_floorImage =  ImageIO.read(new File(images.get(imageName)));
         }
         catch (IOException e)
         {
             e.printStackTrace();
         }
+        setImage(m_floorImage);
     }
 
     public Image getM_floorImage()
     {
         return m_floorImage;
     }
-
-    public int getM_floorPositionX()
-    {
-        return m_floorPositionX;
-    }
-
-    public int getM_floorPositionY()
-    {
-        return m_floorPositionY;
-    }
-
-    public int getM_floorWidth() { return  m_floorWidth;}
-
-    public int getM_floorHeight() {return m_floorHeight;}
 }
 

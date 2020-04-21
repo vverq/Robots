@@ -1,3 +1,4 @@
+10 10
 b wall 0 6 0 0
 b wall 0 0 1 1
 b wall 3 4 1 1

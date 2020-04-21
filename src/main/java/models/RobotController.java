@@ -13,25 +13,25 @@ public class RobotController
     // autoMoveRobot, я боюсь туда залезать
 
     public void moveRobot(GameVisualizer.Direction direction, Robot robot,
-                          ConcurrentLinkedDeque<Barrier> barrierMap, ConcurrentLinkedDeque<Target> targets)
+                          LevelMap map, ConcurrentLinkedDeque<Target> targets)
     {
         double xValue = robot.getM_robotPositionX();
         double yValue = robot.getM_robotPositionY();
         switch(direction) {
             case UP:
-                if (RobotController.isCorrect(xValue, yValue - maxVelocity, barrierMap))
+                if (RobotController.isCorrect(xValue, yValue - maxVelocity, map))
                     yValue -= maxVelocity;
                 break;
             case DOWN:
-                if (RobotController.isCorrect(xValue,yValue + maxVelocity, barrierMap))
+                if (RobotController.isCorrect(xValue,yValue + maxVelocity, map))
                     yValue += maxVelocity;
                 break;
             case RIGHT:
-                if (RobotController.isCorrect(xValue + maxVelocity, yValue, barrierMap))
+                if (RobotController.isCorrect(xValue + maxVelocity, yValue, map))
                     xValue += maxVelocity;
                 break;
             case LEFT:
-                if (RobotController.isCorrect(xValue - maxVelocity, yValue, barrierMap))
+                if (RobotController.isCorrect(xValue - maxVelocity, yValue, map))
                     xValue -= maxVelocity;
                 break;
         }
@@ -56,60 +56,46 @@ public class RobotController
         }
     }
 
-    public void autoMoveRobot(double duration, Robot robot, ConcurrentLinkedDeque<Target> targets)
+    public void autoMoveRobot(Robot robot, ConcurrentLinkedDeque<Target> targets, LevelMap map)
     {
-        var velocity = maxVelocity;
-        var target = targets.getFirst();
-        double distance = RobotController.distance(target.getM_targetPositionX(), target.getM_targetPositionY(),
-                robot.getM_robotPositionX(), robot.getM_robotPositionY());
-        if (distance < 0.5)
-        {
+        if (targets.size() == 0)
             return;
-        }
-        double angleToTarget = RobotController.angleTo(
-                robot.getM_robotPositionX(),
-                robot.getM_robotPositionY(),
-                target.getM_targetPositionX(),
-                target.getM_targetPositionY()
-        );
-        double angularVelocity = 0;
-        if (angleToTarget > robot.getM_robotDirection())
-        {
-            angularVelocity = maxAngularVelocity;
-        }
-        if (angleToTarget < robot.getM_robotDirection())
-        {
-            angularVelocity = -maxAngularVelocity;
-        }
-        velocity = applyLimits(velocity, 0, maxVelocity);
-        angularVelocity = applyLimits(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
-        angleToTarget = RobotController.angleTo(
-                robot.getM_robotPositionX(),
-                robot.getM_robotPositionY(),
-                target.getM_targetPositionX(),
-                target.getM_targetPositionY()
-        );
-        if (Math.abs(angleToTarget - robot.getM_robotDirection()) < 0.1)
-        {
-            var xValue = robot.getM_robotPositionX() + Math.cos(angleToTarget) * duration * velocity;
-            robot.setM_robotPositionX(applyLimits(
-                    xValue,
-                    Math.max(robot.getM_robotDiam1(), robot.getM_robotDiam2()) / 2,
-                    400 - (Math.max(robot.getM_robotDiam1(), robot.getM_robotDiam2()) / 2))
-            );
-
-            var yValue = robot.getM_robotPositionY() + Math.sin(angleToTarget) * duration * velocity;
-            robot.setM_robotPositionY(applyLimits(
-                    yValue,
-                    Math.max(robot.getM_robotDiam1(), robot.getM_robotDiam2()) / 2,
-                    400 - (Math.max(robot.getM_robotDiam1(), robot.getM_robotDiam2()) / 2))
-            );
+        var target = targets.getFirst();
+        var x = round(robot.getM_robotPositionX()) / Block.getM_width();
+        var y = round(robot.getM_robotPositionY()) / Block.getM_height();
+        var currentBlock = map.getMap()[y][x];
+        var targetBlock = map.getMap()[target.getM_blockPositionY()][target.getM_blockPositionX()];
+        int nextBlockX;
+        int nextBlockY;
+        if (Math.abs(round(robot.getM_robotPositionX()) - currentBlock.getM_middlePositionX()) <=
+                round(robot.getM_robotDiam1() / 2)
+                && Math.abs(round(robot.getM_robotPositionY()) -
+                currentBlock.getM_middlePositionY()) <= round(robot.getM_robotDiam2() / 2))  {
+            var nextBlock = map.graph.getNextBlock(currentBlock, targetBlock);
+            nextBlockX = nextBlock.getM_middlePositionX();
+            nextBlockY = nextBlock.getM_middlePositionY();
         }
         else {
-            robot.setM_robotDirection(RobotController.asNormalizedRadians(
-                    robot.getM_robotDirection() + angularVelocity * duration)
-            );
+            nextBlockX = currentBlock.getM_middlePositionX() - round(robot.getM_robotDiam1() / 2);
+            nextBlockY = currentBlock.getM_middlePositionY() - round(robot.getM_robotDiam2() / 2);
         }
+        if (nextBlockX > robot.getM_robotPositionX()) {
+            robot.setM_robotPositionX(Math.min(robot.getM_robotPositionX() + maxVelocity, nextBlockX));
+            setRobotDirection(GameVisualizer.Direction.RIGHT, robot);
+        }
+        else if (nextBlockX < robot.getM_robotPositionX()) {
+            robot.setM_robotPositionX(Math.max(robot.getM_robotPositionX() - maxVelocity, nextBlockX));
+            setRobotDirection(GameVisualizer.Direction.LEFT, robot);
+        }
+        else if (nextBlockY > robot.getM_robotPositionY()) {
+            robot.setM_robotPositionY(Math.min(robot.getM_robotPositionY() + maxVelocity, nextBlockY));
+            setRobotDirection(GameVisualizer.Direction.DOWN, robot);
+        }
+        else {
+            robot.setM_robotPositionY(Math.max(robot.getM_robotPositionY() - maxVelocity, nextBlockY));
+            setRobotDirection(GameVisualizer.Direction.UP, robot);
+        }
+
         for (Target targetForEat: targets)
         {
             if (RobotController.isRobotNearToTarget(
@@ -119,6 +105,66 @@ public class RobotController
                 targets.remove(targetForEat);
             }
         }
+//
+//        double distance = RobotController.distance(target.getM_targetPositionX(), target.getM_targetPositionY(),
+//                robot.getM_robotPositionX(), robot.getM_robotPositionY());
+//        if (distance < 0.5)
+//        {
+//            return;
+//        }
+//        double angleToTarget = RobotController.angleTo(
+//                robot.getM_robotPositionX(),
+//                robot.getM_robotPositionY(),
+//                target.getM_targetPositionX(),
+//                target.getM_targetPositionY()
+//        );
+//        double angularVelocity = 0;
+//        if (angleToTarget > robot.getM_robotDirection())
+//        {
+//            angularVelocity = maxAngularVelocity;
+//        }
+//        if (angleToTarget < robot.getM_robotDirection())
+//        {
+//            angularVelocity = -maxAngularVelocity;
+//        }
+//        velocity = applyLimits(velocity, 0, maxVelocity);
+//        angularVelocity = applyLimits(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
+//        angleToTarget = RobotController.angleTo(
+//                robot.getM_robotPositionX(),
+//                robot.getM_robotPositionY(),
+//                target.getM_targetPositionX(),
+//                target.getM_targetPositionY()
+//        );
+//        if (Math.abs(angleToTarget - robot.getM_robotDirection()) < 0.1)
+//        {
+//            var xValue = robot.getM_robotPositionX() + Math.cos(angleToTarget) * duration * velocity;
+//            robot.setM_robotPositionX(applyLimits(
+//                    xValue,
+//                    Math.max(robot.getM_robotDiam1(), robot.getM_robotDiam2()) / 2,
+//                    400 - (Math.max(robot.getM_robotDiam1(), robot.getM_robotDiam2()) / 2))
+//            );
+//
+//            var yValue = robot.getM_robotPositionY() + Math.sin(angleToTarget) * duration * velocity;
+//            robot.setM_robotPositionY(applyLimits(
+//                    yValue,
+//                    Math.max(robot.getM_robotDiam1(), robot.getM_robotDiam2()) / 2,
+//                    400 - (Math.max(robot.getM_robotDiam1(), robot.getM_robotDiam2()) / 2))
+//            );
+//        }
+//        else {
+//            robot.setM_robotDirection(RobotController.asNormalizedRadians(
+//                    robot.getM_robotDirection() + angularVelocity * duration)
+//            );
+//        }
+//        for (Target targetForEat: targets)
+//        {
+//            if (RobotController.isRobotNearToTarget(
+//                    targetForEat, robot.getM_robotPositionX(),
+//                    robot.getM_robotPositionY(), robot.getM_robotDiam1(), robot.getM_robotDiam2()))
+//            {
+//                targets.remove(targetForEat);
+//            }
+//        }
     }
 
     private static double distance(double x1, double y1, double x2, double y2)
@@ -165,24 +211,11 @@ public class RobotController
         return (int)(value + 0.5);
     }
 
-    public static boolean isCorrect(double xPos, double yPos, ConcurrentLinkedDeque<Barrier> barrierMap)
+    public static boolean isCorrect(double xPos, double yPos, LevelMap map)
     {
-        int x = round(xPos);
-        int y = round(yPos);
-        for (Barrier barrier: barrierMap)
-        {
-            int barrierX = barrier.getM_barrierPositionX() * barrier.getM_berrierWidth();
-            int barrierY = barrier.getM_barrierPositionY() * barrier.getM_barrierHeight();
-
-            if (barrierX <= x
-                    && barrierX + barrier.getM_berrierWidth() >= x
-                    && barrierY <=  y
-                    && barrierY + barrier.getM_barrierHeight() >= y)
-            {
-                return false;
-            }
-        }
-        return true;
+        int x = round(xPos) / Block.getM_width();
+        int y = round(yPos) / Block.getM_height();
+        return map.getMap()[y][x].isAvailableForRobot();
     }
 
     public void setRobotDirection(GameVisualizer.Direction direction, Robot robot) {

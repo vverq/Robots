@@ -23,8 +23,6 @@ public class GameVisualizer extends JPanel
 
     private Robot robot = new Robot(200, 200, 0, "images/robot.png");
     private LevelMap map = new LevelMap("map1.txt");
-    private ConcurrentLinkedDeque<Barrier> barrierMap = map.getBarrierMap();
-    private ConcurrentLinkedDeque<Floor> floorMap = map.getFloorMap();
     private ConcurrentLinkedDeque<Target> targets = new ConcurrentLinkedDeque<>();
     private RobotController robotController = new RobotController();
 
@@ -61,18 +59,20 @@ public class GameVisualizer extends JPanel
             m_timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    robotController.autoMoveRobot(10, robot, targets);
+                    robotController.autoMoveRobot(robot, targets, map);
                 }
-            }, 0, 200);
+            }, 0, 100);
         }
 
         var visualizer = this;
-        this.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent keyEvent) {
-                visualizer.processKeyEvent(keyEvent);
-            }
-        });
+        if (!autoMode) {
+            this.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent keyEvent) {
+                    visualizer.processKeyEvent(keyEvent);
+                }
+            });
+        }
         setFocusable(true);
         setDoubleBuffered(true);
     }
@@ -81,15 +81,16 @@ public class GameVisualizer extends JPanel
     {
         int maxCountTargets = 5;
         int countNewTargets = rnd.nextInt(maxCountTargets - targets.size() + 1);
+        var blocksMap = map.getMap();
         for (var i = 0; i < countNewTargets; i++) {
-            var x = rnd.nextInt(350);
-            var y = rnd.nextInt(350);
-            while (!RobotController.isCorrect(x + 25, y + 25, barrierMap))
-            {
-                x = rnd.nextInt(350);
-                y = rnd.nextInt(350);
-            }
-            targets.addLast(new Target(x, y, targetImages.get(rnd.nextInt(5))));
+            int x;
+            int y;
+            do {
+                x = rnd.nextInt(map.getWidth());
+                y = rnd.nextInt(map.getHeight());
+            } while (!blocksMap[y][x].isAvailableForRobot());
+            targets.addLast(new Target(blocksMap[y][x].getM_middlePositionX() - 10,
+                    blocksMap[y][x].getM_middlePositionY() - 10, targetImages.get(rnd.nextInt(5))));
         }
     }
 
@@ -104,19 +105,19 @@ public class GameVisualizer extends JPanel
         switch (keyEvent.getKeyCode()) {
             case KeyEvent.VK_DOWN:
                 robotController.setRobotDirection(Direction.DOWN, robot);
-                robotController.moveRobot(Direction.DOWN, robot, barrierMap, targets);
+                robotController.moveRobot(Direction.DOWN, robot, map, targets);
                 break;
             case KeyEvent.VK_UP:
                 robotController.setRobotDirection(Direction.UP, robot);
-                robotController.moveRobot(Direction.UP, robot, barrierMap, targets);
+                robotController.moveRobot(Direction.UP, robot, map, targets);
                 break;
             case KeyEvent.VK_RIGHT:
                 robotController.setRobotDirection(Direction.RIGHT, robot);
-                robotController.moveRobot(Direction.RIGHT, robot, barrierMap, targets);
+                robotController.moveRobot(Direction.RIGHT, robot, map, targets);
                 break;
             case KeyEvent.VK_LEFT:
                 robotController.setRobotDirection(Direction.LEFT, robot);
-                robotController.moveRobot(Direction.LEFT, robot, barrierMap, targets);
+                robotController.moveRobot(Direction.LEFT, robot, map, targets);
                 break;
             default:
                 break;
@@ -142,23 +143,15 @@ public class GameVisualizer extends JPanel
     {
         AffineTransform t = AffineTransform.getRotateInstance(0, 15, 15);
         g.setTransform(t);
-        for (Barrier barrier: barrierMap)
-        {
-            g.drawImage(
-                    barrier.getM_barrierImage(),
-                    barrier.getM_barrierPositionX() * barrier.getM_berrierWidth(),
-                    barrier.getM_barrierPositionY() * barrier.getM_barrierHeight(),
-                    null
-            );
-        }
-        for (Floor floor: floorMap)
-        {
-            g.drawImage(
-                    floor.getM_floorImage(),
-                    floor.getM_floorPositionX() * floor.getM_floorWidth(),
-                    floor.getM_floorPositionY() * floor.getM_floorHeight(),
-                    null
-            );
+        for (var i = 0; i < map.getHeight(); i++) {
+            for (var j = 0; j < map.getWidth(); j++) {
+                var block = map.getMap()[i][j];
+                g.drawImage(
+                        block.getImage(),
+                        block.getM_positionX() * Block.getM_width(),
+                        block.getM_positionY() * Block.getM_height(),
+                        null);
+            }
         }
     }
 
