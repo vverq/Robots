@@ -21,7 +21,7 @@ public class GameVisualizer extends JPanel
         return timer;
     }
 
-    private Robot robot = new Robot(200, 200, 0, "images/robot.png");
+    private Robot robot = new Robot(80, 120, 0, "images/robot.png");
     private LevelMap map = new LevelMap("map1.txt");
     private ConcurrentLinkedDeque<Target> targets = new ConcurrentLinkedDeque<>();
     private RobotController robotController = new RobotController();

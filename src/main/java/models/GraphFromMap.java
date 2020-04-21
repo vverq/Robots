@@ -1,23 +1,20 @@
 package models;
 
-        import javafx.util.Pair;
+import javafx.util.Pair;
+import java.util.ArrayList;
+import java.util.Collections;
 
-        import java.util.ArrayList;
-        import java.util.Collections;
-        import java.util.HashSet;
-        import java.util.Queue;
-
-public class GraphFromMap {
-    private HashSet<Block> nodes = new HashSet<>();
+class GraphFromMap
+{
     private LevelMap map;
     private Block cashTarget;
     private ArrayList<Block> cashPath;
 
-    public GraphFromMap(LevelMap map) {
+    GraphFromMap(LevelMap map) {
         this.map = map;
     }
 
-    public Block getNextBlock(Block start, Block target) {
+    Block getNextBlock(Block start, Block target) {
         if (target == cashTarget) {
             for (var i = 0; i < cashPath.size(); i++) {
                 if (cashPath.get(i) == start) {
@@ -32,11 +29,11 @@ public class GraphFromMap {
 
     private ArrayList<Block> getPathTo(Block start, Block target) {
         var blocksMap = map.getMap();
-        var directions = new Pair[] {
-                new Pair<Integer, Integer>(0, 1),
-                new Pair<Integer, Integer>(0, -1),
-                new Pair<Integer, Integer>(1, 0),
-                new Pair<Integer, Integer>(-1, 0)
+        var directions = new Pair[]{
+                new Pair<>(0, 1),
+                new Pair<>(0, -1),
+                new Pair<>(1, 0),
+                new Pair<>(-1, 0)
         };
         var visited = new ArrayList<Block>();
         var previous = new Block[map.getHeight()][map.getWidth()];
@@ -45,8 +42,10 @@ public class GraphFromMap {
         while (true) {
             var flag = false;
             var newQueue = new ArrayList<Block>();
-            for (Block block : queue) {
-                for (Pair direction : directions) {
+            for (Block block : queue)
+            {
+                for (Pair direction : directions)
+                {
                     var x = block.getM_positionX() + (int)direction.getKey();
                     var y = block.getM_positionY() + (int)direction.getValue();
                     if (x < 0 || x >= map.getWidth()
@@ -59,7 +58,8 @@ public class GraphFromMap {
                         continue;
                     newQueue.add(nextBlock);
                     previous[y][x] = block;
-                    if (nextBlock == target) {
+                    if (nextBlock == target)
+                    {
                         flag = true;
                         break;
                     }
@@ -75,7 +75,8 @@ public class GraphFromMap {
         var path = new ArrayList<Block>();
         var block = target;
         path.add(target);
-        while (block != start) {
+        while (block != start)
+        {
             block = previous[block.getM_positionY()][block.getM_positionX()];
             path.add(block);
         }

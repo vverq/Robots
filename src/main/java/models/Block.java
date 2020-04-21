@@ -2,7 +2,8 @@ package models;
 
 import java.awt.*;
 
-public class Block {
+public class Block
+{
     private volatile int m_positionX;
     private volatile int m_positionY;
     private volatile boolean m_isAvailable;
@@ -39,7 +40,7 @@ public class Block {
 
     public boolean isAvailableForRobot() { return m_isAvailable; }
 
-    protected void setImage(Image image) { m_image = image; }
+    void setImage(Image image) { m_image = image; }
 
     public Image getImage() { return m_image; }
 }

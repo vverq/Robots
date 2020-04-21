@@ -12,8 +12,8 @@ public class Target
     private volatile int m_targetPositionX;
     private volatile int m_targetPositionY;
     private volatile Image m_targetImage;
-    private volatile int m_targetWidth = 20;
-    private volatile int m_targetHeight = 20;
+//    private volatile int m_targetWidth = 20;
+//    private volatile int m_targetHeight = 20;
     private volatile int m_blockPositionX;
     private volatile int m_blockPositionY;
 
@@ -43,26 +43,12 @@ public class Target
         return m_targetPositionY;
     }
 
-    public void setM_targetPositionX(int x)
-    {
-        m_targetPositionX = x;
-    }
-
-    public void setM_targetPositionY(int y)
-    {
-        m_targetPositionY = y;
-    }
-
     public Image getM_targetImage()
     {
         return m_targetImage;
     }
 
-    public int getM_targetWidth() { return m_targetWidth; }
+    int getM_blockPositionX() { return m_blockPositionX; }
 
-    public int getM_targetHeight() { return m_targetHeight; }
-
-    public int getM_blockPositionX() { return m_blockPositionX; }
-
-    public int getM_blockPositionY() { return m_blockPositionY; }
+    int getM_blockPositionY() { return m_blockPositionY; }
 }
