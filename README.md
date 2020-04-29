@@ -20,7 +20,11 @@ ___
 * [X] add push-botton control of the robot
 * [X] teach robot to eat targets
 * [X] create a barrier
-
+___
+* [ ] add new window with coordinates of the robot
+* [ ] add new window with distance between the robot and nearest target
+* [ ] separate logic of visualization and robot behavior
+* [ ] model of the robot -- observable
 
 
 optimize threads? Atomic classes?

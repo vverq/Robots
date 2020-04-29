@@ -24,7 +24,7 @@ public class GameVisualizer extends JPanel
     private Robot robot = new Robot(80, 120, 0, "images/robot.png");
     private LevelMap map = new LevelMap("map1.txt");
     private ConcurrentLinkedDeque<Target> targets = new ConcurrentLinkedDeque<>();
-    private RobotController robotController = new RobotController();
+    private RobotController robotController = new RobotController(robot);
 
     private final HashMap<Integer, String> targetImages = new HashMap<>();
     {
@@ -59,7 +59,7 @@ public class GameVisualizer extends JPanel
             m_timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    robotController.autoMoveRobot(robot, targets, map);
+                    robotController.autoMoveRobot(targets, map);
                 }
             }, 0, 100);
         }
@@ -105,19 +105,19 @@ public class GameVisualizer extends JPanel
         switch (keyEvent.getKeyCode()) {
             case KeyEvent.VK_DOWN:
                 robotController.setRobotDirection(Direction.DOWN, robot);
-                robotController.moveRobot(Direction.DOWN, robot, map, targets);
+                robotController.moveRobot(Direction.DOWN, map, targets);
                 break;
             case KeyEvent.VK_UP:
                 robotController.setRobotDirection(Direction.UP, robot);
-                robotController.moveRobot(Direction.UP, robot, map, targets);
+                robotController.moveRobot(Direction.UP, map, targets);
                 break;
             case KeyEvent.VK_RIGHT:
                 robotController.setRobotDirection(Direction.RIGHT, robot);
-                robotController.moveRobot(Direction.RIGHT, robot, map, targets);
+                robotController.moveRobot(Direction.RIGHT, map, targets);
                 break;
             case KeyEvent.VK_LEFT:
                 robotController.setRobotDirection(Direction.LEFT, robot);
-                robotController.moveRobot(Direction.LEFT, robot, map, targets);
+                robotController.moveRobot(Direction.LEFT, map, targets);
                 break;
             default:
                 break;

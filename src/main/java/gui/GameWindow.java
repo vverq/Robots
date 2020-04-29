@@ -14,7 +14,7 @@ public class GameWindow extends RestorableJInternalFrame
 
     GameWindow(String title, boolean autoMode, StatesKeeper keeper) throws IOException
     {
-        super(title, true, true, true, true);
+        super(title, true, true, false, true);
         m_visualizer = new GameVisualizer(autoMode);
         m_keeper = keeper;
         m_keeper.register(this, "GameWindow");
@@ -33,7 +33,7 @@ public class GameWindow extends RestorableJInternalFrame
         super.dispose();
     }
 
-    public void updateNames(Locale locale)
+    void updateNames(Locale locale)
     {
         var bundle = ResourceBundle.getBundle("MainApplicationFrameBundle", locale);
         setLocale(locale);

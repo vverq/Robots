@@ -8,7 +8,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
 
-public class StatesKeeper
+class StatesKeeper
 {
     private HashMap<String, Restorable> restorableObjects;
     private JSONObject savedProperties;
@@ -16,7 +16,7 @@ public class StatesKeeper
 
     StatesKeeper(File storageFile)
     {
-        restorableObjects = new HashMap<String, Restorable>();
+        restorableObjects = new HashMap<>();
         this.storageFile = storageFile;
     }
 

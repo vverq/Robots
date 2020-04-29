@@ -2,13 +2,25 @@ package models;
 
 import gui.GameVisualizer;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class RobotController
 {
     private static final double maxVelocity = 5;
+    private Robot robot;
+    private double[] newsCoordinates;
+    private PropertyChangeSupport support;
 
-    public void moveRobot(GameVisualizer.Direction direction, Robot robot,
+    public RobotController(Robot CRobot)
+    {
+        robot = CRobot;
+        support = new PropertyChangeSupport(this);
+        //addPropertyChangeListener(RobotsProgram.frame.getStateCoordinatesWindow());
+    }
+
+    public void moveRobot(GameVisualizer.Direction direction,
                           LevelMap map, ConcurrentLinkedDeque<Target> targets)
     {
         double xValue = robot.getM_robotPositionX();
@@ -41,6 +53,7 @@ public class RobotController
                 Math.max(robot.getM_robotDiam1(), robot.getM_robotDiam2()) / 2,
                 400 - (Math.max(robot.getM_robotDiam1(), robot.getM_robotDiam2()) / 2))
         );
+        setNewsCoordinates(new double[]{xValue, yValue});
         for (Target targetForEat: targets)
         {
             if (RobotController.isRobotNearToTarget(
@@ -52,7 +65,7 @@ public class RobotController
         }
     }
 
-    public void autoMoveRobot(Robot robot, ConcurrentLinkedDeque<Target> targets, LevelMap map)
+    public void autoMoveRobot(ConcurrentLinkedDeque<Target> targets, LevelMap map)
     {
         if (targets.size() == 0)
             return;
@@ -91,7 +104,6 @@ public class RobotController
             robot.setM_robotPositionY(Math.max(robot.getM_robotPositionY() - maxVelocity, nextBlockY));
             setRobotDirection(GameVisualizer.Direction.UP, robot);
         }
-
         for (Target targetForEat: targets)
         {
             if (isRobotNearToTarget(
@@ -144,5 +156,21 @@ public class RobotController
     private static double applyLimits(double value, double min, double max)
     {
         return Math.min(max, Math.max(value,min));
+    }
+
+    private void addPropertyChangeListener(PropertyChangeListener pcl)
+    {
+        support.addPropertyChangeListener(pcl);
+    }
+
+    private void removePropertyChangeListener(PropertyChangeListener pcl)
+    {
+        support.removePropertyChangeListener(pcl);
+    }
+
+    private void setNewsCoordinates(double[] coordinates)
+    {
+        support.firePropertyChange("newsCoordinates", this.newsCoordinates, coordinates);
+        this.newsCoordinates = coordinates;
     }
 }
