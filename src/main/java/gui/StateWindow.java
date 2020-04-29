@@ -1,5 +1,7 @@
 package gui;
 
+import models.RobotController;
+
 import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
@@ -24,7 +26,7 @@ public class StateWindow extends JInternalFrame implements PropertyChangeListene
         pack();
     }
 
-    private void setText(String text)
+    protected void setText(String text)
     {
         label.setText(text);
     }
@@ -33,6 +35,5 @@ public class StateWindow extends JInternalFrame implements PropertyChangeListene
     public void propertyChange(PropertyChangeEvent propertyChangeEvent)
     {
         this.setText(propertyChangeEvent.getNewValue().toString());
-        //
     }
 }

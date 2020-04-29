@@ -31,6 +31,7 @@ public class MainApplicationFrame extends JFrame
     private DialogWindow modeChooserWindow;
     private StatesKeeper keeper;
     private StateWindow stateCoordinatesWindow;
+    private StateWindow stateDistanceWindow;
 
     MainApplicationFrame()
     {
@@ -46,7 +47,7 @@ public class MainApplicationFrame extends JFrame
         exitWindow = createExitWindow();
         warningWindow = createRestoreWarningWindow();
         stateCoordinatesWindow = createStateCoordinatesWindow();
-        StateWindow stateDistanceWindow = createStateDistanceWindow();
+        stateDistanceWindow = createStateDistanceWindow();
 
         setJMenuBar(menuBar);
         addWindow(logWindow);
@@ -166,7 +167,8 @@ public class MainApplicationFrame extends JFrame
     private StateWindow createStateCoordinatesWindow()
     {
         var stateCoordinatesWindowTitle = bundle.getString("coordinatesWindowTitle");
-        StateWindow stateCoordinatesWindow = new StateWindow(stateCoordinatesWindowTitle);
+        StateWindow stateCoordinatesWindow = new StateCoordinatesWindow(
+                stateCoordinatesWindowTitle, gameWindow.getRobotController());
         stateCoordinatesWindow.setLocation(800, 50);
         stateCoordinatesWindow.setSize(200, 100);
 //        stateCoordinatesWindow.setText("aaa");
@@ -176,7 +178,8 @@ public class MainApplicationFrame extends JFrame
     private StateWindow createStateDistanceWindow()
     {
         var stateDistanceWindowTitle = bundle.getString("distanceWindowTitle");
-        StateWindow stateDistanceWindow = new StateWindow(stateDistanceWindowTitle);
+        StateWindow stateDistanceWindow = new StateDistanceWindow(
+                stateDistanceWindowTitle, gameWindow.getRobotController(), gameWindow.getTargetGenerator());
         stateDistanceWindow.setLocation(800, 250);
         stateDistanceWindow.setSize(200, 100);
 //        stateCoordinatesWindow.setText("aaa");
