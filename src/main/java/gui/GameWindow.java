@@ -12,10 +12,10 @@ public class GameWindow extends RestorableJInternalFrame
     private final GameVisualizer m_visualizer;
     private StatesKeeper m_keeper;
 
-    GameWindow(String title, StatesKeeper keeper) throws IOException
+    GameWindow(String title, boolean autoMode, StatesKeeper keeper) throws IOException
     {
         super(title, true, true, true, true);
-        m_visualizer = new GameVisualizer();
+        m_visualizer = new GameVisualizer(autoMode);
         m_keeper = keeper;
         m_keeper.register(this, "GameWindow");
         JPanel panel = new JPanel(new BorderLayout());

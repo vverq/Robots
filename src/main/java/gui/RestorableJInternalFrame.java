@@ -54,13 +54,11 @@ public class RestorableJInternalFrame extends JInternalFrame implements Restorab
                     break;
                 case "LocationX":
                     location.x = Integer.parseInt((String)propertyValue);
-                    if (isMaximum)
-                        setLocation(location);
-                    else
-                        location = getLocation();
+                    setLocation(location);
                     break;
                 case "LocationY":
                     location.y = Integer.parseInt((String)propertyValue);
+                    setLocation(location);
                     break;
                 default:
                     break;

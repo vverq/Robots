@@ -26,6 +26,7 @@ class MainApplicationFrame extends JFrame
     private JMenuBar menuBar;
     private DialogWindow exitWindow;
     private DialogWindow warningWindow;
+    private DialogWindow modeChooserWindow;
     private StatesKeeper keeper;
 
     MainApplicationFrame()
@@ -34,6 +35,8 @@ class MainApplicationFrame extends JFrame
         setLocationRelativeTo(null);
         setContentPane(desktopPane);
         setMinimumSize(new Dimension(750,600));
+
+        modeChooserWindow = createModeChooserWindow();
 
         menuBar = generateMenuBar();
         logWindow = createLogWindow();
@@ -88,6 +91,17 @@ class MainApplicationFrame extends JFrame
         return new DialogWindow(warningDialogTitle, warningDialog, warningWindowOptions);
     }
 
+    private DialogWindow createModeChooserWindow()
+    {
+        var modeChooseTitle = bundle.getString("modeChooseDialogTitle");
+        var modeChooseDialog =  bundle.getString("modeChooseDialog");
+        String[] warningWindowOptions = {
+                bundle.getString("modeChooseDialogItemFirst"),
+                bundle.getString("modeChooseDialogItemSecond")
+        };
+        return new DialogWindow(modeChooseTitle, modeChooseDialog, warningWindowOptions);
+    }
+
     private DialogWindow createExitWindow()
     {
         var exitWindowTitle = bundle.getString("exitDialogTitle");
@@ -116,7 +130,13 @@ class MainApplicationFrame extends JFrame
         var gameWindowTitle = bundle.getString("gameWindowTitle");
         try
         {
-            GameWindow gameWindow = new GameWindow(gameWindowTitle, keeper);
+            var automode = false;
+            if (modeChooserWindow.createDialogAndGetAnswer())
+            {
+                automode = true;
+            }
+
+            GameWindow gameWindow = new GameWindow(gameWindowTitle, automode , keeper);
             logWindow.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
             gameWindow.addInternalFrameListener(getInternalFrameListener(gameWindow));
             gameWindow.setLocation(300, 50);

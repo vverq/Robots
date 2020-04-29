@@ -15,5 +15,12 @@ ___
 * [X] remember states windows apps
 * [X] restore states windows apps
 * [X] create saved state warning
+___
+* [X] add some kinds of target and fix their behavior
+* [X] add push-botton control of the robot
+* [X] teach robot to eat targets
+* [X] create a barrier
+
+
 
 optimize threads? Atomic classes?
