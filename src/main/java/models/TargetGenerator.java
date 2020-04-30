@@ -10,7 +10,8 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
-public class TargetGenerator {
+public class TargetGenerator
+{
     private PropertyChangeSupport support;
     private Random rnd = new Random();
     private final Timer m_timer = initTimer();
@@ -29,7 +30,9 @@ public class TargetGenerator {
         targetImages.put(3, "images/ramen.png");
         targetImages.put(4, "images/yogurt.png");
     }
-    public TargetGenerator(LevelMap map) {
+
+    public TargetGenerator(LevelMap map)
+    {
         this.map = map;
         support = new PropertyChangeSupport(this);
         m_timer.schedule(new TimerTask()
@@ -47,7 +50,8 @@ public class TargetGenerator {
         int maxCountTargets = 5;
         int countNewTargets = rnd.nextInt(maxCountTargets - targets.size() + 1);
         var blocksMap = map.getMap();
-        for (var i = 0; i < countNewTargets; i++) {
+        for (var i = 0; i < countNewTargets; i++)
+        {
             int x;
             int y;
             do {

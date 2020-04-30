@@ -9,13 +9,15 @@ import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-public class StateDistanceWindow extends StateWindow {
-    private ConcurrentLinkedDeque<Target> targets;
-    private double[] coordinates = new double[] { 0, 0 };
+public class StateDistanceWindow extends StateWindow
+{
+    private ConcurrentLinkedDeque<Target> targets = new ConcurrentLinkedDeque<>();
+    private int[] coordinates;
     private RobotController robotController;
     private TargetGenerator targetGenerator;
 
-    public StateDistanceWindow(String title, RobotController robotController, TargetGenerator targetGenerator) {
+    StateDistanceWindow(String title, RobotController robotController, TargetGenerator targetGenerator)
+    {
         super(title);
         this.robotController = robotController;
         this.targetGenerator = targetGenerator;
@@ -24,38 +26,53 @@ public class StateDistanceWindow extends StateWindow {
     }
 
     @Override
-    public void dispose() {
+    public void dispose()
+    {
         targetGenerator.removePropertyChangeListener(this);
         robotController.removePropertyChangeListener(this);
         super.dispose();
     }
 
-    private double getDistance(Target target) {
-        return Math.sqrt(Math.pow(coordinates[0] - target.getM_targetPositionX(), 2)
+    private int getDistance(Target target)
+    {
+        return (int) Math.sqrt(Math.pow(coordinates[0] - target.getM_targetPositionX(), 2)
                 + Math.pow(coordinates[1] - target.getM_targetPositionY(), 2));
     }
 
-    private double getShortestDistance() {
-        var shortestDistance = Double.MAX_VALUE;
-        if (targets == null) {
-            return 0;
-        }
-        for (Target target : targets) {
+    private int getShortestDistance()
+    {
+        var shortestDistance = Integer.MAX_VALUE;
+        for (Target target : targets)
+        {
             var distance = getDistance(target);
             shortestDistance = Math.min(shortestDistance, distance);
         }
         return shortestDistance;
     }
 
+    private void setDistance()
+    {
+        if (!targets.isEmpty())
+        {
+            setText(Integer.toString(getShortestDistance() - (int) (robotController.getRobot().getM_robotDiam1() / 2)));
+        }
+        else
+        {
+            setText("N/A");
+        }
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent propertyChangeEvent)
     {
-        if (propertyChangeEvent.getPropertyName().equals("newTargets")) {
+        if (propertyChangeEvent.getPropertyName().equals("newTargets"))
+        {
             targets = (ConcurrentLinkedDeque<Target>)propertyChangeEvent.getNewValue();
         }
-        else if (propertyChangeEvent.getPropertyName().equals("newCoordinates")) {
-            coordinates = (double[])propertyChangeEvent.getNewValue();
+        else if (propertyChangeEvent.getPropertyName().equals("newCoordinates"))
+        {
+            coordinates = (int[])propertyChangeEvent.getNewValue();
         }
-        setText(Double.toString(getShortestDistance()));
+        setDistance();
     }
 }

@@ -70,18 +70,19 @@ public class GameWindow extends RestorableJInternalFrame
         setFocusable(true);
     }
 
-    public enum Direction {
+    public enum Direction
+    {
         UP,
         DOWN,
         RIGHT,
         LEFT
     }
 
-    public RobotController getRobotController() {
+    RobotController getRobotController() {
         return robotController;
     }
 
-    public TargetGenerator getTargetGenerator() {
+    TargetGenerator getTargetGenerator() {
         return targetGenerator;
     }
 

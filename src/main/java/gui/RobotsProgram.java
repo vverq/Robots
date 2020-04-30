@@ -7,8 +7,8 @@ import javax.swing.UIManager;
 
 public class RobotsProgram
 {
-//    public static MainApplicationFrame frame;
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
       try {
         UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
       } catch (Exception e) {

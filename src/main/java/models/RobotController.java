@@ -1,18 +1,15 @@
 package models;
 
 import gui.GameWindow;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class RobotController
 {
     private static final double maxVelocity = 5;
     private Robot robot;
-    private double[] newsCoordinates;
+    private int[] newsCoordinates;
     private PropertyChangeSupport support;
 
     public RobotController(Robot CRobot)
@@ -54,7 +51,7 @@ public class RobotController
                 Math.max(robot.getM_robotDiam1(), robot.getM_robotDiam2()) / 2,
                 400 - (Math.max(robot.getM_robotDiam1(), robot.getM_robotDiam2()) / 2))
         );
-        setNewsCoordinates(new double[]{xValue, yValue});
+        setNewsCoordinates(new int[]{(int) xValue, (int) yValue});
         for (Target targetForEat: targets)
         {
             if (RobotController.isRobotNearToTarget(
@@ -105,7 +102,7 @@ public class RobotController
             robot.setM_robotPositionY(Math.max(robot.getM_robotPositionY() - maxVelocity, nextBlockY));
             setRobotDirection(GameWindow.Direction.UP, robot);
         }
-        setNewsCoordinates(new double[]{robot.getM_robotPositionX(), robot.getM_robotPositionY()});
+        setNewsCoordinates(new int[]{(int) robot.getM_robotPositionX(), (int) robot.getM_robotPositionY()});
         for (Target targetForEat: targets)
         {
             if (isRobotNearToTarget(
@@ -170,9 +167,14 @@ public class RobotController
         support.removePropertyChangeListener(pcl);
     }
 
-    private void setNewsCoordinates(double[] coordinates)
+    private void setNewsCoordinates(int[] coordinates)
     {
         support.firePropertyChange("newCoordinates", this.newsCoordinates, coordinates);
         this.newsCoordinates = coordinates;
+    }
+
+    public Robot getRobot()
+    {
+        return robot;
     }
 }

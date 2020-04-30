@@ -21,10 +21,10 @@ ___
 * [X] teach robot to eat targets
 * [X] create a barrier
 ___
-* [ ] add new window with coordinates of the robot
-* [ ] add new window with distance between the robot and nearest target
-* [ ] separate logic of visualization and robot behavior
-* [ ] model of the robot -- observable
+* [X] add new window with coordinates of the robot
+* [X] add new window with distance between the robot and nearest target
+* [X] separate logic of visualization and robot behavior
+* [X] model of the robot -- observable
 
 
 optimize threads? Atomic classes?

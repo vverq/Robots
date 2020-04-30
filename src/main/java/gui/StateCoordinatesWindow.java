@@ -5,19 +5,23 @@ import models.Target;
 
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
+import java.util.Arrays;
 
-public class StateCoordinatesWindow extends StateWindow {
-    private double[] coordinates;
+public class StateCoordinatesWindow extends StateWindow
+{
+    private int[] coordinates;
     private RobotController robotController;
 
-    public StateCoordinatesWindow(String title, RobotController robotController) {
+    StateCoordinatesWindow(String title, RobotController robotController)
+    {
         super(title);
         this.robotController = robotController;
         robotController.addPropertyChangeListener(this);
     }
 
     @Override
-    public void dispose() {
+    public void dispose()
+    {
         robotController.removePropertyChangeListener(this);
         super.dispose();
     }
@@ -25,8 +29,9 @@ public class StateCoordinatesWindow extends StateWindow {
     @Override
     public void propertyChange(PropertyChangeEvent propertyChangeEvent)
     {
-        if (propertyChangeEvent.getPropertyName().equals("newCoordinates")) {
-            coordinates = (double[])propertyChangeEvent.getNewValue();
+        if (propertyChangeEvent.getPropertyName().equals("newCoordinates"))
+        {
+            coordinates = (int[])propertyChangeEvent.getNewValue();
         }
         setText("X: " + coordinates[0] + " Y: " + coordinates[1]);
     }

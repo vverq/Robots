@@ -36,7 +36,7 @@ public class Robot
         return m_robotPositionX;
     }
 
-    public void setM_robotPositionX(double x)
+    void setM_robotPositionX(double x)
     {
         m_robotPositionX = x;
     }
@@ -46,7 +46,7 @@ public class Robot
         return m_robotPositionY;
     }
 
-    public void setM_robotPositionY(double y)
+    void setM_robotPositionY(double y)
     {
         m_robotPositionY = y;
     }
@@ -56,7 +56,7 @@ public class Robot
         return m_robotDirection;
     }
 
-    public void setM_robotDirection(double direction)
+    void setM_robotDirection(double direction)
     {
         m_robotDirection = direction;
     }

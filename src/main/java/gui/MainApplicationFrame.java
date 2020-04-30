@@ -88,12 +88,6 @@ public class MainApplicationFrame extends JFrame
         }
     }
 
-//    public StateWindow getStateCoordinatesWindow()
-//    {
-//        return stateCoordinatesWindow;
-//    }
-//
-
     private DialogWindow createRestoreWarningWindow()
     {
         var warningDialogTitle = bundle.getString("warningDialogTitle");

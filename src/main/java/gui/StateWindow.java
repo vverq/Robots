@@ -10,7 +10,7 @@ import java.beans.PropertyChangeListener;
 
 public class StateWindow extends JInternalFrame implements PropertyChangeListener {
     private JLabel label;
-    private double[] news;
+    private int[] news;
 
     StateWindow(String title)
     {
@@ -18,15 +18,15 @@ public class StateWindow extends JInternalFrame implements PropertyChangeListene
         label = new JLabel();
         label.setHorizontalAlignment((int) CENTER_ALIGNMENT);
         label.setVerticalAlignment((int) CENTER_ALIGNMENT);
-        label.setFont(new Font("Courier New", Font.ITALIC, 14));
+        label.setFont(new Font("Courier New", Font.BOLD, 14));
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.MAGENTA);
+        panel.setBackground(Color.lightGray);
         panel.add(label);
         getContentPane().add(panel);
         pack();
     }
 
-    protected void setText(String text)
+    void setText(String text)
     {
         label.setText(text);
     }
