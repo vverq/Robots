@@ -1,14 +1,24 @@
 package models;
 
-import gui.GameVisualizer;
-
+import gui.GameWindow;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class RobotController
 {
     private static final double maxVelocity = 5;
+    private Robot robot;
+    private int[] newsCoordinates;
+    private PropertyChangeSupport support;
 
-    public void moveRobot(GameVisualizer.Direction direction, Robot robot,
+    public RobotController(Robot CRobot)
+    {
+        robot = CRobot;
+        support = new PropertyChangeSupport(this);
+    }
+
+    public void moveRobot(GameWindow.Direction direction,
                           LevelMap map, ConcurrentLinkedDeque<Target> targets)
     {
         double xValue = robot.getM_robotPositionX();
@@ -41,6 +51,7 @@ public class RobotController
                 Math.max(robot.getM_robotDiam1(), robot.getM_robotDiam2()) / 2,
                 400 - (Math.max(robot.getM_robotDiam1(), robot.getM_robotDiam2()) / 2))
         );
+        setNewsCoordinates(new int[]{(int) xValue, (int) yValue});
         for (Target targetForEat: targets)
         {
             if (RobotController.isRobotNearToTarget(
@@ -52,7 +63,7 @@ public class RobotController
         }
     }
 
-    public void autoMoveRobot(Robot robot, ConcurrentLinkedDeque<Target> targets, LevelMap map)
+    public void autoMoveRobot(ConcurrentLinkedDeque<Target> targets, LevelMap map)
     {
         if (targets.size() == 0)
             return;
@@ -77,21 +88,21 @@ public class RobotController
         }
         if (nextBlockX > robot.getM_robotPositionX()) {
             robot.setM_robotPositionX(Math.min(robot.getM_robotPositionX() + maxVelocity, nextBlockX));
-            setRobotDirection(GameVisualizer.Direction.RIGHT, robot);
+            setRobotDirection(GameWindow.Direction.RIGHT, robot);
         }
         else if (nextBlockX < robot.getM_robotPositionX()) {
             robot.setM_robotPositionX(Math.max(robot.getM_robotPositionX() - maxVelocity, nextBlockX));
-            setRobotDirection(GameVisualizer.Direction.LEFT, robot);
+            setRobotDirection(GameWindow.Direction.LEFT, robot);
         }
         else if (nextBlockY > robot.getM_robotPositionY()) {
             robot.setM_robotPositionY(Math.min(robot.getM_robotPositionY() + maxVelocity, nextBlockY));
-            setRobotDirection(GameVisualizer.Direction.DOWN, robot);
+            setRobotDirection(GameWindow.Direction.DOWN, robot);
         }
         else {
             robot.setM_robotPositionY(Math.max(robot.getM_robotPositionY() - maxVelocity, nextBlockY));
-            setRobotDirection(GameVisualizer.Direction.UP, robot);
+            setRobotDirection(GameWindow.Direction.UP, robot);
         }
-
+        setNewsCoordinates(new int[]{(int) robot.getM_robotPositionX(), (int) robot.getM_robotPositionY()});
         for (Target targetForEat: targets)
         {
             if (isRobotNearToTarget(
@@ -126,7 +137,7 @@ public class RobotController
         return map.getMap()[y][x].isAvailableForRobot();
     }
 
-    public void setRobotDirection(GameVisualizer.Direction direction, Robot robot) {
+    public void setRobotDirection(GameWindow.Direction direction, Robot robot) {
         switch (direction) {
             case DOWN:
                 robot.setM_robotDirection(Math.toRadians(180));
@@ -144,5 +155,26 @@ public class RobotController
     private static double applyLimits(double value, double min, double max)
     {
         return Math.min(max, Math.max(value,min));
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener pcl)
+    {
+        support.addPropertyChangeListener(pcl);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener pcl)
+    {
+        support.removePropertyChangeListener(pcl);
+    }
+
+    private void setNewsCoordinates(int[] coordinates)
+    {
+        support.firePropertyChange("newCoordinates", this.newsCoordinates, coordinates);
+        this.newsCoordinates = coordinates;
+    }
+
+    public Robot getRobot()
+    {
+        return robot;
     }
 }

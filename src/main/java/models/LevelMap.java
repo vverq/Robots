@@ -3,14 +3,13 @@ package models;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
-import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class LevelMap
 {
     private int width;
     private int height;
     private Block[][] map;
-    public GraphFromMap graph;
+    GraphFromMap graph;
 
     public LevelMap(String filename)
     {

@@ -1,6 +1,7 @@
 package gui;
 
 import log.Logger;
+import models.RobotController;
 import org.json.simple.parser.ParseException;
 
 import java.awt.*;
@@ -9,13 +10,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import javax.sound.midi.SysexMessage;
 import javax.swing.*;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
 
-class MainApplicationFrame extends JFrame
+public class MainApplicationFrame extends JFrame
 {
     private final JDesktopPane desktopPane = new JDesktopPane();
     private Locale locale = Locale.getDefault();
@@ -28,6 +30,8 @@ class MainApplicationFrame extends JFrame
     private DialogWindow warningWindow;
     private DialogWindow modeChooserWindow;
     private StatesKeeper keeper;
+    private StateWindow stateCoordinatesWindow;
+    private StateWindow stateDistanceWindow;
 
     MainApplicationFrame()
     {
@@ -37,18 +41,21 @@ class MainApplicationFrame extends JFrame
         setMinimumSize(new Dimension(750,600));
 
         modeChooserWindow = createModeChooserWindow();
-
         menuBar = generateMenuBar();
         logWindow = createLogWindow();
         gameWindow = createGameWindow();
         exitWindow = createExitWindow();
         warningWindow = createRestoreWarningWindow();
+        stateCoordinatesWindow = createStateCoordinatesWindow();
+        stateDistanceWindow = createStateDistanceWindow();
 
         setJMenuBar(menuBar);
         addWindow(logWindow);
         addWindow(gameWindow);
-        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        addWindow(stateCoordinatesWindow);
+        addWindow(stateDistanceWindow);
 
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter()
         {
             @Override
@@ -80,6 +87,7 @@ class MainApplicationFrame extends JFrame
             Logger.error(e.toString());
         }
     }
+
     private DialogWindow createRestoreWarningWindow()
     {
         var warningDialogTitle = bundle.getString("warningDialogTitle");
@@ -140,7 +148,7 @@ class MainApplicationFrame extends JFrame
             logWindow.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
             gameWindow.addInternalFrameListener(getInternalFrameListener(gameWindow));
             gameWindow.setLocation(300, 50);
-            gameWindow.setSize(400, 400);
+            gameWindow.setSize(100, 100);
             return gameWindow;
         }
         catch (IOException e)
@@ -148,6 +156,28 @@ class MainApplicationFrame extends JFrame
             Logger.error(e.toString());
         }
         return gameWindow;
+    }
+
+    private StateWindow createStateCoordinatesWindow()
+    {
+        var stateCoordinatesWindowTitle = bundle.getString("coordinatesWindowTitle");
+        StateWindow stateCoordinatesWindow = new StateCoordinatesWindow(
+                stateCoordinatesWindowTitle, gameWindow.getRobotController());
+        stateCoordinatesWindow.setLocation(800, 50);
+        stateCoordinatesWindow.setSize(200, 100);
+//        stateCoordinatesWindow.setText("aaa");
+        return stateCoordinatesWindow;
+    }
+
+    private StateWindow createStateDistanceWindow()
+    {
+        var stateDistanceWindowTitle = bundle.getString("distanceWindowTitle");
+        StateWindow stateDistanceWindow = new StateDistanceWindow(
+                stateDistanceWindowTitle, gameWindow.getRobotController(), gameWindow.getTargetGenerator());
+        stateDistanceWindow.setLocation(800, 250);
+        stateDistanceWindow.setSize(200, 100);
+//        stateCoordinatesWindow.setText("aaa");
+        return stateDistanceWindow;
     }
 
     private void addWindow(JInternalFrame frame)
