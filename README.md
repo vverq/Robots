@@ -25,6 +25,13 @@ ___
 * [X] add new window with distance between the robot and nearest target
 * [X] separate logic of visualization and robot behavior
 * [X] model of the robot -- observable
+___
+* [ ] add enemies that will hunt the robot
+* [ ] teach the robot to shoot at enemies
+* [ ] teach enemies to die from shots
+* [ ] add maps and teach the robot to run by them
+* [ ] use logs to describe actions
+* [ ] add treasures
 
 
 optimize threads? Atomic classes?
