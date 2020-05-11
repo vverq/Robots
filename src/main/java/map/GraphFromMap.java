@@ -8,27 +8,12 @@ import java.util.Collections;
 public class GraphFromMap
 {
     private LevelMap map;
-    private BlockMap cashTarget;
-    private ArrayList<BlockMap> cashPath;
 
     GraphFromMap(LevelMap map) {
         this.map = map;
     }
 
-    public BlockMap getNextBlock(BlockMap start, BlockMap target) {
-        if (target == cashTarget) {
-            for (var i = 0; i < cashPath.size(); i++) {
-                if (cashPath.get(i) == start) {
-                    return cashPath.get(i + 1);
-                }
-            }
-        }
-        cashTarget = target;
-        cashPath = getPathTo(start, target);
-        return cashPath.get(1);
-    }
-
-    private ArrayList<BlockMap> getPathTo(BlockMap start, BlockMap target) {
+    public ArrayList<BlockMap> getPathTo(BlockMap start, BlockMap target) {
         var blocksMap = map.getMap();
         var directions = new Pair[]{
                 new Pair<>(0, 1),

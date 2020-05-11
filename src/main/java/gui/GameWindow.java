@@ -43,7 +43,7 @@ public class GameWindow extends RestorableJInternalFrame {
         targetGenerator = new TargetGenerator(map);
         robotController = new RobotController(robot);
         enemyController = new EnemyController(enemy);
-        m_visualizer = new GameVisualizer(autoMode, robot, map, robotController, targetGenerator, enemyController);
+        m_visualizer = new GameVisualizer(autoMode, robot, map, robotController, targetGenerator, enemyController, enemy);
         m_keeper = keeper;
         m_keeper.register(this, "GameWindow");
         JPanel panel = new JPanel(new BorderLayout());
@@ -61,6 +61,13 @@ public class GameWindow extends RestorableJInternalFrame {
                 }
             }, 0, 100);
         }
+
+        m_timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                enemyController.moveEnemy(robot, map);
+            }
+        }, 0, 100);
 
         var visualizer = this;
 //        if (!autoMode) {

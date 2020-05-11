@@ -3,13 +3,16 @@ package models;
 import map.BlockMap;
 import map.LevelMap;
 
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class EnemyController
 {
-    private static final double maxVelocity = 5;
+    private static final double maxVelocity = 2;
     private ConcurrentLinkedDeque<Enemy> enemies;
     private Enemy enemy;
+    private BlockMap cashTarget;
+    private ArrayList<BlockMap> cashPath;
 
     public EnemyController(ConcurrentLinkedDeque<Enemy> enemies)
     {
@@ -26,14 +29,32 @@ public class EnemyController
         var x = round(enemy.getEnemyPositionX()) / BlockMap.getM_width();
         var y = round(enemy.getEnemyPositionY()) / BlockMap.getM_height();
         var currentBlock = map.getMap()[y][x];
-        var robotBlock = map.getMap()[(int) robot.getM_robotPositionY() / BlockMap.getM_width()][(int) robot.getM_robotPositionX() / BlockMap.getM_height()];
+        BlockMap robotBlock;
+        synchronized (robot) {
+            robotBlock = map.getMap()[(int) robot.getM_robotPositionY() / BlockMap.getM_width()][(int) robot.getM_robotPositionX() / BlockMap.getM_height()];
+        }
         int nextBlockX;
         int nextBlockY;
         if (Math.abs(round(enemy.getEnemyPositionX()) - currentBlock.getM_middlePositionX()) <=
                 round(enemy.getEnemyWidth() / 2)
                 && Math.abs(round(enemy.getEnemyPositionY()) -
                 currentBlock.getM_middlePositionY()) <= round(enemy.getEnemyHeight() / 2))  {
-            var nextBlock = map.graph.getNextBlock(currentBlock, robotBlock);
+            BlockMap nextBlock = null;
+            if (robotBlock == cashTarget) {
+                for (var i = 0; i < cashPath.size(); i++) {
+                    if (cashPath.get(i) == currentBlock) {
+                        if (i + 1 < cashPath.size())
+                            nextBlock = cashPath.get(i + 1);
+                        else
+                            nextBlock = currentBlock;
+                    }
+                }
+            }
+            if (nextBlock == null) {
+                cashTarget = robotBlock;
+                cashPath = map.graph.getPathTo(currentBlock, robotBlock);
+                nextBlock = cashPath.get(1);
+            }
             nextBlockX = nextBlock.getM_middlePositionX();
             nextBlockY = nextBlock.getM_middlePositionY();
         }

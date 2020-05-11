@@ -27,13 +27,14 @@ public class GameVisualizer extends JPanel
     private EnemyController enemyController;
 
     GameVisualizer(boolean autoMode, Robot robot, LevelMap map, RobotController robotController,
-                   TargetGenerator targetGenerator, EnemyController enemyController)
+                   TargetGenerator targetGenerator, EnemyController enemyController, Enemy enemy)
     {
         this.robot = robot;
         this.map = map;
         this.robotController = robotController;
         this.targetGenerator = targetGenerator;
         this.enemyController = enemyController;
+        this.enemy = enemy;
         m_timer.schedule(new TimerTask()
         {
             @Override
@@ -58,7 +59,7 @@ public class GameVisualizer extends JPanel
         drawMap(g2d);
         drawRobot(g2d);
         drawTarget(g2d);
-        //drawEnemy(g2d);
+        drawEnemy(g2d);
     }
 
     private void drawMap(Graphics2D g)

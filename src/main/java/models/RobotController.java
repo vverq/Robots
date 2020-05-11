@@ -6,6 +6,7 @@ import map.LevelMap;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class RobotController
@@ -14,6 +15,8 @@ public class RobotController
     private Robot robot;
     private int[] newsCoordinates;
     private PropertyChangeSupport support;
+    private BlockMap cashTarget;
+    private ArrayList<BlockMap> cashPath;
 
     public RobotController(Robot CRobot)
     {
@@ -81,7 +84,19 @@ public class RobotController
                 round(robot.getM_robotDiam1() / 2)
                 && Math.abs(round(robot.getM_robotPositionY()) -
                 currentBlock.getM_middlePositionY()) <= round(robot.getM_robotDiam2() / 2))  {
-            var nextBlock = map.graph.getNextBlock(currentBlock, targetBlock);
+            BlockMap nextBlock = null;
+            if (targetBlock == cashTarget) {
+                for (var i = 0; i < cashPath.size(); i++) {
+                    if (cashPath.get(i) == currentBlock) {
+                        nextBlock = cashPath.get(i + 1);
+                    }
+                }
+            }
+            if (nextBlock == null) {
+                cashTarget = targetBlock;
+                cashPath = map.graph.getPathTo(currentBlock, targetBlock);
+                nextBlock = cashPath.get(1);
+            }
             nextBlockX = nextBlock.getM_middlePositionX();
             nextBlockY = nextBlock.getM_middlePositionY();
         }
