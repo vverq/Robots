@@ -1,7 +1,9 @@
 package gui;
 
+import map.LevelMap;
 import models.*;
 import models.Robot;
+import map.BlockMap;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -18,17 +20,20 @@ public class GameVisualizer extends JPanel
         return timer;
     }
     private Robot robot;
+    private Enemy enemy;
     private LevelMap map;
     private RobotController robotController;
     private TargetGenerator targetGenerator;
+    private EnemyController enemyController;
 
     GameVisualizer(boolean autoMode, Robot robot, LevelMap map, RobotController robotController,
-                   TargetGenerator targetGenerator)
+                   TargetGenerator targetGenerator, EnemyController enemyController)
     {
         this.robot = robot;
         this.map = map;
         this.robotController = robotController;
         this.targetGenerator = targetGenerator;
+        this.enemyController = enemyController;
         m_timer.schedule(new TimerTask()
         {
             @Override
@@ -53,6 +58,7 @@ public class GameVisualizer extends JPanel
         drawMap(g2d);
         drawRobot(g2d);
         drawTarget(g2d);
+        //drawEnemy(g2d);
     }
 
     private void drawMap(Graphics2D g)
@@ -64,8 +70,8 @@ public class GameVisualizer extends JPanel
                 var block = map.getMap()[i][j];
                 g.drawImage(
                         block.getImage(),
-                        block.getM_positionX() * Block.getM_width(),
-                        block.getM_positionY() * Block.getM_height(),
+                        block.getM_positionX() * BlockMap.getM_width(),
+                        block.getM_positionY() * BlockMap.getM_height(),
                         null);
             }
         }
@@ -98,5 +104,19 @@ public class GameVisualizer extends JPanel
                     null
             );
         }
+    }
+
+    private void drawEnemy(Graphics2D g)
+    {
+//        AffineTransform t = AffineTransform.getRotateInstance(0, 0, 0);
+//        g.setTransform(t);
+        int enemyCenterX = EnemyController.round(enemy.getEnemyPositionX());
+        int enemyCenterY = EnemyController.round(enemy.getEnemyPositionY());
+        g.drawImage(
+                enemy.getEnemyImage(),
+                enemyCenterX - enemy.getEnemyImage().getHeight(null) / 2,
+                enemyCenterY - enemy.getEnemyImage().getWidth(null) / 2,
+                null
+        );
     }
 }

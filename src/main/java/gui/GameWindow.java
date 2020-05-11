@@ -8,37 +8,42 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.*;
-import models.Robot;
-import models.RobotController;
-import models.LevelMap;
-import models.TargetGenerator;
 
-public class GameWindow extends RestorableJInternalFrame
-{
+import models.*;
+import map.LevelMap;
+import models.Robot;
+
+public class GameWindow extends RestorableJInternalFrame {
     private final GameVisualizer m_visualizer;
     private final Robot robot;
     private final RobotController robotController;
     private final LevelMap map;
     private final TargetGenerator targetGenerator;
+    private final Enemy enemy;
+    private final EnemyController enemyController;
     private StatesKeeper m_keeper;
 
     private final java.util.Timer m_timer = initTimer();
-    private static java.util.Timer initTimer()
-    {
+
+    private static java.util.Timer initTimer() {
         java.util.Timer timer = new Timer("events generator", true);
         return timer;
     }
 
-    GameWindow(String title, boolean autoMode, StatesKeeper keeper) throws IOException
-    {
+    private final java.util.Timer timer1 = initTimer();
+
+    GameWindow(String title, boolean autoMode, StatesKeeper keeper) throws IOException {
         super(title, true, true, false, true);
         robot = new Robot(80, 120, 0, "images/robot.png");
         map = new LevelMap("map1.txt");
+        enemy = new Enemy(80, 80, "images/virus.png");
         targetGenerator = new TargetGenerator(map);
         robotController = new RobotController(robot);
-        m_visualizer = new GameVisualizer(autoMode, robot, map, robotController, targetGenerator);
+        enemyController = new EnemyController(enemy);
+        m_visualizer = new GameVisualizer(autoMode, robot, map, robotController, targetGenerator, enemyController);
         m_keeper = keeper;
         m_keeper.register(this, "GameWindow");
         JPanel panel = new JPanel(new BorderLayout());
@@ -48,8 +53,7 @@ public class GameWindow extends RestorableJInternalFrame
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         pack();
 
-        if (autoMode)
-        {
+        if (autoMode) {
             m_timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
@@ -59,14 +63,31 @@ public class GameWindow extends RestorableJInternalFrame
         }
 
         var visualizer = this;
-        if (!autoMode) {
-            this.addKeyListener(new KeyAdapter() {
-                @Override
-                public void keyPressed(KeyEvent keyEvent) {
-                    visualizer.processKeyEvent(keyEvent);
-                }
-            });
-        }
+//        if (!autoMode) {
+//            this.addKeyListener(new KeyAdapter() {
+//                @Override
+//                public void keyPressed(KeyEvent keyEvent) {
+//                    if (!isMoving.get()) {
+//                        isMoving.set(true);
+//                        while (true) {
+////                            visualizer.processKeyEvent(keyEvent);
+//                        }
+//                    }
+//                }
+//
+//                @Override
+//                public void keyReleased(KeyEvent e) {
+//                    isMoving.set(false);
+//                }
+//            });
+//    }
+
+//        timer1.schedule(new TimerTask() {
+//                             @Override
+//                             public void run() {
+//                                 enemyController.moveEnemy(robot, map);
+//                             }
+//                         }, 0, 1000);
         setFocusable(true);
     }
 
@@ -100,6 +121,7 @@ public class GameWindow extends RestorableJInternalFrame
         setTitle(bundle.getString("gameWindowTitle"));
     }
 
+    @Override
     protected void processKeyEvent(KeyEvent keyEvent) {
         switch (keyEvent.getKeyCode()) {
             case KeyEvent.VK_DOWN:

@@ -1,4 +1,4 @@
-package models;
+package map;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,8 +8,8 @@ public class LevelMap
 {
     private int width;
     private int height;
-    private Block[][] map;
-    GraphFromMap graph;
+    private BlockMap[][] map;
+    public GraphFromMap graph;
 
     public LevelMap(String filename)
     {
@@ -19,7 +19,7 @@ public class LevelMap
             var strMapSize = sc.nextLine().split(" ");
             width = Integer.parseInt(strMapSize[0]);
             height = Integer.parseInt(strMapSize[1]);
-            map = new Block[height][width];
+            map = new BlockMap[height][width];
             graph = new GraphFromMap(this);
             while (sc.hasNext())
             {
@@ -50,5 +50,5 @@ public class LevelMap
 
     public int getHeight() { return height; }
 
-    public Block[][] getMap() { return map; }
+    public BlockMap[][] getMap() { return map; }
 }

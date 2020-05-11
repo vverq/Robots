@@ -1,20 +1,21 @@
-package models;
+package map;
 
 import javafx.util.Pair;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
-class GraphFromMap
+public class GraphFromMap
 {
     private LevelMap map;
-    private Block cashTarget;
-    private ArrayList<Block> cashPath;
+    private BlockMap cashTarget;
+    private ArrayList<BlockMap> cashPath;
 
     GraphFromMap(LevelMap map) {
         this.map = map;
     }
 
-    Block getNextBlock(Block start, Block target) {
+    public BlockMap getNextBlock(BlockMap start, BlockMap target) {
         if (target == cashTarget) {
             for (var i = 0; i < cashPath.size(); i++) {
                 if (cashPath.get(i) == start) {
@@ -27,7 +28,7 @@ class GraphFromMap
         return cashPath.get(1);
     }
 
-    private ArrayList<Block> getPathTo(Block start, Block target) {
+    private ArrayList<BlockMap> getPathTo(BlockMap start, BlockMap target) {
         var blocksMap = map.getMap();
         var directions = new Pair[]{
                 new Pair<>(0, 1),
@@ -35,14 +36,14 @@ class GraphFromMap
                 new Pair<>(1, 0),
                 new Pair<>(-1, 0)
         };
-        var visited = new ArrayList<Block>();
-        var previous = new Block[map.getHeight()][map.getWidth()];
-        var queue = new ArrayList<Block>();
+        var visited = new ArrayList<BlockMap>();
+        var previous = new BlockMap[map.getHeight()][map.getWidth()];
+        var queue = new ArrayList<BlockMap>();
         queue.add(start);
         while (true) {
             var flag = false;
-            var newQueue = new ArrayList<Block>();
-            for (Block block : queue)
+            var newQueue = new ArrayList<BlockMap>();
+            for (BlockMap block : queue)
             {
                 for (Pair direction : directions)
                 {
@@ -72,7 +73,7 @@ class GraphFromMap
                 break;
             queue = newQueue;
         }
-        var path = new ArrayList<Block>();
+        var path = new ArrayList<BlockMap>();
         var block = target;
         path.add(target);
         while (block != start)

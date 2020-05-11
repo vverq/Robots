@@ -1,11 +1,11 @@
 package models;
 
+import map.BlockMap;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Target
 {
@@ -17,12 +17,12 @@ public class Target
     private volatile int m_blockPositionX;
     private volatile int m_blockPositionY;
 
-    public Target(int x, int y, String imageName)
+    Target(int x, int y, String imageName)
     {
         m_targetPositionX = x;
         m_targetPositionY = y;
-        m_blockPositionX = x / Block.getM_width();
-        m_blockPositionY = y / Block.getM_height();
+        m_blockPositionX = x / BlockMap.getM_width();
+        m_blockPositionY = y / BlockMap.getM_height();
         try
         {
             m_targetImage = ImageIO.read(new File(imageName));

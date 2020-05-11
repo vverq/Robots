@@ -1,6 +1,9 @@
 package models;
 
 import gui.GameWindow;
+import map.BlockMap;
+import map.LevelMap;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -68,8 +71,8 @@ public class RobotController
         if (targets.size() == 0)
             return;
         var target = targets.getFirst();
-        var x = round(robot.getM_robotPositionX()) / Block.getM_width();
-        var y = round(robot.getM_robotPositionY()) / Block.getM_height();
+        var x = round(robot.getM_robotPositionX()) / BlockMap.getM_width();
+        var y = round(robot.getM_robotPositionY()) / BlockMap.getM_height();
         var currentBlock = map.getMap()[y][x];
         var targetBlock = map.getMap()[target.getM_blockPositionY()][target.getM_blockPositionX()];
         int nextBlockX;
@@ -132,8 +135,8 @@ public class RobotController
 
     private static boolean isCorrect(double xPos, double yPos, LevelMap map)
     {
-        int x = round(xPos) / Block.getM_width();
-        int y = round(yPos) / Block.getM_height();
+        int x = round(xPos) / BlockMap.getM_width();
+        int y = round(yPos) / BlockMap.getM_height();
         return map.getMap()[y][x].isAvailableForRobot();
     }
 

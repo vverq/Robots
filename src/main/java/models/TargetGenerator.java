@@ -1,6 +1,6 @@
 package models;
 
-import gui.StateDistanceWindow;
+import map.LevelMap;
 
 import java.util.HashMap;
 import java.util.Random;
