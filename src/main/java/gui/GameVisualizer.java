@@ -7,8 +7,10 @@ import map.BlockMap;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.io.IOException;
 import java.util.*;
-import javax.swing.JPanel;
+import java.util.Timer;
+import javax.swing.*;
 
 
 public class GameVisualizer extends JPanel
@@ -42,7 +44,7 @@ public class GameVisualizer extends JPanel
             {
                 onRedrawEvent();
             }
-        }, 0, 50);
+        }, 0, 1);
         setDoubleBuffered(true);
     }
 
@@ -57,7 +59,11 @@ public class GameVisualizer extends JPanel
         super.paint(g);
         Graphics2D g2d = (Graphics2D)g;
         drawMap(g2d);
-        drawRobot(g2d);
+        try {
+            drawRobot(g2d);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         drawTarget(g2d);
         drawEnemy(g2d);
     }
@@ -78,19 +84,26 @@ public class GameVisualizer extends JPanel
         }
     }
 
-    private void drawRobot(Graphics2D g)
-    {
+    private void drawRobot(Graphics2D g) throws IOException {
         int robotCenterX = RobotController.round(robot.getM_robotPositionX());
         int robotCenterY = RobotController.round(robot.getM_robotPositionY());
-        AffineTransform t = AffineTransform.getRotateInstance(robot.getM_robotDirection(), robotCenterX, robotCenterY);
-        g.setTransform(t);
+//        AffineTransform t = AffineTransform.getRotateInstance(robot.getM_robotDirection(), robotCenterX, robotCenterY);
+//        g.setTransform(t);
         g.drawImage(
                 robot.getM_robotImage(),
                 robotCenterX - robot.getM_robotImage().getHeight(null) / 2,
                 robotCenterY - robot.getM_robotImage().getWidth(null) / 2,
                 null
         );
+        if (robot.getFires().size() > 0)
+        {
+            for (Fire fire: robot.getFires())
+            {
+                g.drawImage(fire.getFireImage(), fire.getX(), fire.getY(), null);
+            }
+        }
     }
+
 
     private void drawTarget(Graphics2D g)
     {
@@ -109,8 +122,6 @@ public class GameVisualizer extends JPanel
 
     private void drawEnemy(Graphics2D g)
     {
-//        AffineTransform t = AffineTransform.getRotateInstance(0, 0, 0);
-//        g.setTransform(t);
         int enemyCenterX = EnemyController.round(enemy.getEnemyPositionX());
         int enemyCenterY = EnemyController.round(enemy.getEnemyPositionY());
         g.drawImage(

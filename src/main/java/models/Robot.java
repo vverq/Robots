@@ -4,6 +4,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class Robot
 {
@@ -13,17 +14,23 @@ public class Robot
     private volatile double m_robotDiam1;
     private volatile double m_robotDiam2;
     private volatile Image m_robotImage;
+    private volatile boolean isAlive;
+    private volatile boolean isAttack;
+    private volatile ConcurrentLinkedDeque<Fire> fires;
 
     public Robot(double x, double y, double direction, String imageName)
     {
         try
         {
+            isAttack = false;
+            isAlive = true;
             m_robotPositionX = x;
             m_robotPositionY = y;
             m_robotDirection = direction;
             m_robotImage = ImageIO.read(new File(imageName));
             m_robotDiam1 = m_robotImage.getWidth(null);
             m_robotDiam2 = m_robotImage.getHeight(null);
+            fires = new ConcurrentLinkedDeque<>();
         }
         catch (IOException e)
         {
@@ -71,8 +78,50 @@ public class Robot
         return m_robotDiam1;
     }
 
-    public double getM_robotDiam2()
+    double getM_robotDiam2()
     {
         return m_robotDiam2;
+    }
+
+    private void setM_robotImage(String imageName)
+    {
+        try {
+            m_robotImage = ImageIO.read(new File(imageName));
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    void killRobot()
+    {
+        setM_robotImage("images/deadCat.png");
+        isAlive = false;
+    }
+
+    boolean isAlive()
+    {
+        return isAlive;
+    }
+
+    public void setAttackStatus(boolean isAttack)
+    {
+        this.isAttack = isAttack;
+    }
+
+    public boolean getAttackStatus()
+    {
+        return isAttack;
+    }
+
+    void setFire(Fire fire)
+    {
+        fires.addFirst(fire);
+    }
+
+    public ConcurrentLinkedDeque<Fire> getFires()
+    {
+        return fires;
     }
 }

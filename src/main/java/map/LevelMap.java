@@ -51,4 +51,9 @@ public class LevelMap
     public int getHeight() { return height; }
 
     public BlockMap[][] getMap() { return map; }
+
+//    public FireMap[][] getFireMap()
+//    {
+//        return fireMap;
+//    }
 }

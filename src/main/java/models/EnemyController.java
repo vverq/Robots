@@ -6,6 +6,8 @@ import map.LevelMap;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+//todo мб так же подписывать на события, а не передавать самого робота?
+
 public class EnemyController
 {
     private static final double maxVelocity = 2;
@@ -78,7 +80,7 @@ public class EnemyController
                     robot, enemy.getEnemyPositionX(),
                     enemy.getEnemyPositionY(), enemy.getEnemyWidth(), enemy.getEnemyHeight()))
             {
-                //todo умереть
+                robot.killRobot();
                 System.out.println("мертв");
             }
     }

@@ -1,14 +1,12 @@
 package gui;
 
 import java.awt.*;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.*;
 
@@ -39,7 +37,7 @@ public class GameWindow extends RestorableJInternalFrame {
         super(title, true, true, false, true);
         robot = new Robot(80, 120, 0, "images/robot.png");
         map = new LevelMap("map1.txt");
-        enemy = new Enemy(80, 80, "images/virus.png");
+        enemy = new Enemy(360, 80, "images/virus.png");
         targetGenerator = new TargetGenerator(map);
         robotController = new RobotController(robot);
         enemyController = new EnemyController(enemy);
@@ -130,24 +128,48 @@ public class GameWindow extends RestorableJInternalFrame {
 
     @Override
     protected void processKeyEvent(KeyEvent keyEvent) {
+        // todo навести красоту в этом методе, эти ифы в каждом кейсе не оч
         switch (keyEvent.getKeyCode()) {
             case KeyEvent.VK_DOWN:
+                if (robotController.getRobot().getAttackStatus())
+                {
+                    robotController.getRobot().setAttackStatus(false);
+                }
                 robotController.setRobotDirection(Direction.DOWN, robot);
                 robotController.moveRobot(Direction.DOWN, map, targetGenerator.getTargets());
                 break;
             case KeyEvent.VK_UP:
+                if (robotController.getRobot().getAttackStatus())
+                {
+                    robotController.getRobot().setAttackStatus(false);
+                }
                 robotController.setRobotDirection(Direction.UP, robot);
                 robotController.moveRobot(Direction.UP, map, targetGenerator.getTargets());
                 break;
             case KeyEvent.VK_RIGHT:
+                if (robotController.getRobot().getAttackStatus())
+                {
+                    robotController.getRobot().setAttackStatus(false);
+                }
                 robotController.setRobotDirection(Direction.RIGHT, robot);
                 robotController.moveRobot(Direction.RIGHT, map, targetGenerator.getTargets());
                 break;
             case KeyEvent.VK_LEFT:
+                if (robotController.getRobot().getAttackStatus())
+                {
+                    robotController.getRobot().setAttackStatus(false);
+                }
                 robotController.setRobotDirection(Direction.LEFT, robot);
                 robotController.moveRobot(Direction.LEFT, map, targetGenerator.getTargets());
                 break;
+            case KeyEvent.VK_SPACE:
+                robotController.attack(map);
+                break;
             default:
+                if (robotController.getRobot().getAttackStatus())
+                {
+                    robotController.getRobot().setAttackStatus(false);
+                }
                 break;
         }
     }
