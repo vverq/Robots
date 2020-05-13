@@ -54,7 +54,7 @@ public class EnemyController
             }
             if (nextBlock == null) {
                 cashTarget = robotBlock;
-                cashPath = map.graph.getPathTo(currentBlock, robotBlock);
+                cashPath = map.graph.getPathTo(currentBlock, robotBlock, false);
                 nextBlock = cashPath.get(1);
             }
             nextBlockX = nextBlock.getM_middlePositionX();

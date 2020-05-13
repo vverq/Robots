@@ -20,8 +20,7 @@ public class GameWindow extends RestorableJInternalFrame {
     private final RobotController robotController;
     private final LevelMap map;
     private final TargetGenerator targetGenerator;
-    private final Enemy enemy;
-    private final EnemyController enemyController;
+    private final EnemyGenerator enemyGenerator;
     private StatesKeeper m_keeper;
 
     private final java.util.Timer m_timer = initTimer();
@@ -37,11 +36,10 @@ public class GameWindow extends RestorableJInternalFrame {
         super(title, true, true, false, true);
         robot = new Robot(80, 120, 0, "images/robot.png");
         map = new LevelMap("map1.txt");
-        enemy = new Enemy(360, 80, "images/virus.png");
+        enemyGenerator = new EnemyGenerator(map);
         targetGenerator = new TargetGenerator(map);
         robotController = new RobotController(robot);
-        enemyController = new EnemyController(enemy);
-        m_visualizer = new GameVisualizer(autoMode, robot, map, robotController, targetGenerator, enemyController, enemy);
+        m_visualizer = new GameVisualizer(autoMode, robot, map, robotController, targetGenerator, enemyGenerator);
         m_keeper = keeper;
         m_keeper.register(this, "GameWindow");
         JPanel panel = new JPanel(new BorderLayout());
@@ -63,7 +61,8 @@ public class GameWindow extends RestorableJInternalFrame {
         m_timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                enemyController.moveEnemy(robot, map);
+                for (EnemyController enemyController : enemyGenerator.getEnemyControllers().values())
+                    enemyController.moveEnemy(robot, map);
             }
         }, 0, 100);
 

@@ -16,7 +16,6 @@ public class Robot
     private volatile Image m_robotImage;
     private volatile boolean isAlive;
     private volatile boolean isAttack;
-    private volatile ConcurrentLinkedDeque<Fire> fires;
 
     public Robot(double x, double y, double direction, String imageName)
     {
@@ -30,7 +29,6 @@ public class Robot
             m_robotImage = ImageIO.read(new File(imageName));
             m_robotDiam1 = m_robotImage.getWidth(null);
             m_robotDiam2 = m_robotImage.getHeight(null);
-            fires = new ConcurrentLinkedDeque<>();
         }
         catch (IOException e)
         {
@@ -113,15 +111,5 @@ public class Robot
     public boolean getAttackStatus()
     {
         return isAttack;
-    }
-
-    void setFire(Fire fire)
-    {
-        fires.addFirst(fire);
-    }
-
-    public ConcurrentLinkedDeque<Fire> getFires()
-    {
-        return fires;
     }
 }

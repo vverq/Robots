@@ -7,6 +7,8 @@ import java.awt.*;
 public class Fire
 {
     private volatile Image fireImage = new ImageIcon("images/fire.gif").getImage();
+    private volatile int height = fireImage.getHeight(null);
+    private volatile int width = fireImage.getWidth(null);
     private volatile int x;
     private volatile int y;
 
@@ -30,4 +32,8 @@ public class Fire
     {
         return y;
     }
+
+    public int getMiddleX() { return x + width / 2; }
+
+    public int getMiddleY() { return y + height / 2; }
 }

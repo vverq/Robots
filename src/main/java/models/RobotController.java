@@ -69,7 +69,10 @@ public class RobotController
                     targets.remove(targetForEat);
                 }
             }
-            if (isRobotBurns())
+            var x = round(robot.getM_robotPositionX()) / BlockMap.getM_width();
+            var y = round(robot.getM_robotPositionY()) / BlockMap.getM_height();
+            var currentBlock = map.getMap()[y][x];
+            if (isRobotBurns(currentBlock, map))
             {
                 robot.killRobot();
             }
@@ -104,7 +107,7 @@ public class RobotController
                 }
                 if (nextBlock == null) {
                     cashTarget = targetBlock;
-                    cashPath = map.graph.getPathTo(currentBlock, targetBlock);
+                    cashPath = map.graph.getPathTo(currentBlock, targetBlock, true);
                     nextBlock = cashPath.get(1);
                 }
                 nextBlockX = nextBlock.getM_middlePositionX();
@@ -153,24 +156,6 @@ public class RobotController
                 && targetY <= robotY + robotDiam2 / 2 && targetY >= robotY - robotDiam2 / 2;
     }
 
-    private boolean isRobotBurns()
-    {
-        // todo карта огня?
-        // todo не очень классно, что приходиться каждый раз перебирать эту коллекцию с огнями
-        for (Fire fire: robot.getFires())
-        {
-            var fireX = fire.getX();
-            var fireY = fire.getY();
-            var robotX = round(robot.getM_robotPositionX());
-            var robotY = round(robot.getM_robotPositionY());
-            if (fireX <= robotX + 40 && fireX >= robotX - 40
-                    && fireY <= robotY + 20 && fireY >= robotY - 20)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
 
     public static int round(double value)
     {
@@ -228,6 +213,10 @@ public class RobotController
     public void attack(LevelMap map)
     {
         robot.setAttackStatus(true);
-        robot.setFire(new Fire(round(robot.getM_robotPositionX() - 50 ), round(robot.getM_robotPositionY()) - 20));
+        map.addFire(new Fire(round(robot.getM_robotPositionX() - 50 ), round(robot.getM_robotPositionY()) - 20));
+    }
+
+    private boolean isRobotBurns(BlockMap currentBlock, LevelMap map) {
+        return map.getFireMap()[currentBlock.getM_positionY()][currentBlock.getM_positionX()] != null;
     }
 }

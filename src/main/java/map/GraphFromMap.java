@@ -13,7 +13,7 @@ public class GraphFromMap
         this.map = map;
     }
 
-    public ArrayList<BlockMap> getPathTo(BlockMap start, BlockMap target) {
+    public ArrayList<BlockMap> getPathTo(BlockMap start, BlockMap target, boolean isItRobot) {
         var blocksMap = map.getMap();
         var directions = new Pair[]{
                 new Pair<>(0, 1),

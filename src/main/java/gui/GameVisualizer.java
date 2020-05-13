@@ -22,21 +22,19 @@ public class GameVisualizer extends JPanel
         return timer;
     }
     private Robot robot;
-    private Enemy enemy;
+    private EnemyGenerator enemyGenerator;
     private LevelMap map;
     private RobotController robotController;
     private TargetGenerator targetGenerator;
-    private EnemyController enemyController;
 
     GameVisualizer(boolean autoMode, Robot robot, LevelMap map, RobotController robotController,
-                   TargetGenerator targetGenerator, EnemyController enemyController, Enemy enemy)
+                   TargetGenerator targetGenerator, EnemyGenerator enemyGenerator)
     {
         this.robot = robot;
         this.map = map;
         this.robotController = robotController;
         this.targetGenerator = targetGenerator;
-        this.enemyController = enemyController;
-        this.enemy = enemy;
+        this.enemyGenerator = enemyGenerator;
         m_timer.schedule(new TimerTask()
         {
             @Override
@@ -95,9 +93,9 @@ public class GameVisualizer extends JPanel
                 robotCenterY - robot.getM_robotImage().getWidth(null) / 2,
                 null
         );
-        if (robot.getFires().size() > 0)
+        if (map.getFires().size() > 0)
         {
-            for (Fire fire: robot.getFires())
+            for (Fire fire: map.getFires())
             {
                 g.drawImage(fire.getFireImage(), fire.getX(), fire.getY(), null);
             }
@@ -122,13 +120,15 @@ public class GameVisualizer extends JPanel
 
     private void drawEnemy(Graphics2D g)
     {
-        int enemyCenterX = EnemyController.round(enemy.getEnemyPositionX());
-        int enemyCenterY = EnemyController.round(enemy.getEnemyPositionY());
-        g.drawImage(
-                enemy.getEnemyImage(),
-                enemyCenterX - enemy.getEnemyImage().getHeight(null) / 2,
-                enemyCenterY - enemy.getEnemyImage().getWidth(null) / 2,
-                null
-        );
+        for (Enemy enemy : enemyGenerator.getEnemies()) {
+            int enemyCenterX = EnemyController.round(enemy.getEnemyPositionX());
+            int enemyCenterY = EnemyController.round(enemy.getEnemyPositionY());
+            g.drawImage(
+                    enemy.getEnemyImage(),
+                    enemyCenterX - enemy.getEnemyImage().getHeight(null) / 2,
+                    enemyCenterY - enemy.getEnemyImage().getWidth(null) / 2,
+                    null
+            );
+        }
     }
 }
