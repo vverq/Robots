@@ -23,15 +23,15 @@ public class GameVisualizer extends JPanel
     }
     private Robot robot;
     private EnemyGenerator enemyGenerator;
-    private LevelMap map;
     private RobotController robotController;
     private TargetGenerator targetGenerator;
+    private LevelMap map;
 
-    GameVisualizer(boolean autoMode, Robot robot, LevelMap map, RobotController robotController,
-                   TargetGenerator targetGenerator, EnemyGenerator enemyGenerator)
+    GameVisualizer(boolean autoMode, Robot robot, RobotController robotController,
+                   TargetGenerator targetGenerator, EnemyGenerator enemyGenerator, LevelMap map)
     {
-        this.robot = robot;
         this.map = map;
+        this.robot = robot;
         this.robotController = robotController;
         this.targetGenerator = targetGenerator;
         this.enemyGenerator = enemyGenerator;
@@ -60,6 +60,10 @@ public class GameVisualizer extends JPanel
         drawRobot(g2d);
         drawTarget(g2d);
         drawEnemy(g2d);
+    }
+
+    protected void setMap(LevelMap map) {
+        this.map = map;
     }
 
     private void drawMap(Graphics2D g)

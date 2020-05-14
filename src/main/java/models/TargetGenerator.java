@@ -68,6 +68,8 @@ public class TargetGenerator
         return targets;
     }
 
+    public void setMap(LevelMap map) { this.map = map; }
+
     public void addPropertyChangeListener(PropertyChangeListener pcl)
     {
         support.addPropertyChangeListener(pcl);

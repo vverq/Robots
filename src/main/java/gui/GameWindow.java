@@ -33,7 +33,7 @@ public class GameWindow extends RestorableJInternalFrame {
 
     private final java.util.Timer timer1 = initTimer();
 
-    GameWindow(String title, boolean autoMode, StatesKeeper keeper) throws IOException {
+    public GameWindow(String title, boolean autoMode, StatesKeeper keeper) throws IOException {
         super(title, true, true, false, true);
         LevelMap[] maps = new LevelMap[]{new LevelMap("map1.txt"), new LevelMap("map2.txt")};
         robot = new Robot(80, 120, 0, "images/robot.png");
@@ -42,7 +42,7 @@ public class GameWindow extends RestorableJInternalFrame {
         enemyGenerator = new EnemyGenerator(map);
         targetGenerator = new TargetGenerator(map);
         robotController = new RobotController(robot);
-        m_visualizer = new GameVisualizer(autoMode, robot, getLevelMap(), robotController, targetGenerator, enemyGenerator);
+        m_visualizer = new GameVisualizer(autoMode, robot, robotController, targetGenerator, enemyGenerator, map);
         m_keeper = keeper;
         m_keeper.register(this, "GameWindow");
         JPanel panel = new JPanel(new BorderLayout());
@@ -58,10 +58,13 @@ public class GameWindow extends RestorableJInternalFrame {
                 new TimerTask() {
                     @Override
                     public void run() {
-                        if (robotController.getRobot().getM_robotPositionY() >= 30)
+                        if (robotController.getRobot().getM_robotPositionY() >= 300)
                         {
                             System.out.println("hehhe");
                             map = maps[1];
+                            m_visualizer.setMap(map);
+                            enemyGenerator.setMap(map);
+                            targetGenerator.setMap(map);
                         }
                     }
                 }, 0 ,100);

@@ -57,4 +57,6 @@ public class EnemyGenerator {
     public ConcurrentLinkedDeque<Enemy> getEnemies() { return enemies; }
 
     public HashMap<Enemy, EnemyController> getEnemyControllers() { return enemyControllers; }
+
+    public void setMap(LevelMap map) { this.map = map; }
 }
