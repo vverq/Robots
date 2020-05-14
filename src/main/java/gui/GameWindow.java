@@ -15,7 +15,7 @@ import map.LevelMap;
 import models.Robot;
 
 public class GameWindow extends RestorableJInternalFrame {
-    private final GameVisualizer m_visualizer;
+    private GameVisualizer m_visualizer;
     private final Robot robot;
     private final RobotController robotController;
     private final TargetGenerator targetGenerator;
@@ -42,7 +42,7 @@ public class GameWindow extends RestorableJInternalFrame {
         enemyGenerator = new EnemyGenerator(map);
         targetGenerator = new TargetGenerator(map);
         robotController = new RobotController(robot);
-        m_visualizer = new GameVisualizer(autoMode, robot, map, robotController, targetGenerator, enemyGenerator);
+        m_visualizer = new GameVisualizer(autoMode, robot, getLevelMap(), robotController, targetGenerator, enemyGenerator);
         m_keeper = keeper;
         m_keeper.register(this, "GameWindow");
         JPanel panel = new JPanel(new BorderLayout());
@@ -52,6 +52,8 @@ public class GameWindow extends RestorableJInternalFrame {
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         pack();
 
+
+        // ЕСЛИ РАСКОММЕНТИТЬ, ТО ОГОНЬ НЕ РАБОТАЕЕЕЕЕЕЕЕЕТ
         m_timerMapsUpdate.schedule(
                 new TimerTask() {
                     @Override
@@ -62,13 +64,13 @@ public class GameWindow extends RestorableJInternalFrame {
                             map = maps[1];
                         }
                     }
-                }, 0 ,10);
+                }, 0 ,100);
 
         if (autoMode) {
             m_timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    robotController.autoMoveRobot(targetGenerator.getTargets(), map);
+                    robotController.autoMoveRobot(targetGenerator.getTargets(), getLevelMap());
                 }
             }, 0, 100);
         }
@@ -150,7 +152,7 @@ public class GameWindow extends RestorableJInternalFrame {
                     robotController.getRobot().setAttackStatus(false);
                 }
                 robotController.setRobotDirection(Direction.DOWN, robot);
-                robotController.moveRobot(Direction.DOWN, map, targetGenerator.getTargets());
+                robotController.moveRobot(Direction.DOWN, getLevelMap(), targetGenerator.getTargets());
                 break;
             case KeyEvent.VK_UP:
                 if (robotController.getRobot().getAttackStatus())
@@ -158,7 +160,7 @@ public class GameWindow extends RestorableJInternalFrame {
                     robotController.getRobot().setAttackStatus(false);
                 }
                 robotController.setRobotDirection(Direction.UP, robot);
-                robotController.moveRobot(Direction.UP, map, targetGenerator.getTargets());
+                robotController.moveRobot(Direction.UP, getLevelMap(), targetGenerator.getTargets());
                 break;
             case KeyEvent.VK_RIGHT:
                 if (robotController.getRobot().getAttackStatus())
@@ -166,7 +168,7 @@ public class GameWindow extends RestorableJInternalFrame {
                     robotController.getRobot().setAttackStatus(false);
                 }
                 robotController.setRobotDirection(Direction.RIGHT, robot);
-                robotController.moveRobot(Direction.RIGHT, map, targetGenerator.getTargets());
+                robotController.moveRobot(Direction.RIGHT, getLevelMap(), targetGenerator.getTargets());
                 break;
             case KeyEvent.VK_LEFT:
                 if (robotController.getRobot().getAttackStatus())
@@ -174,10 +176,10 @@ public class GameWindow extends RestorableJInternalFrame {
                     robotController.getRobot().setAttackStatus(false);
                 }
                 robotController.setRobotDirection(Direction.LEFT, robot);
-                robotController.moveRobot(Direction.LEFT, map, targetGenerator.getTargets());
+                robotController.moveRobot(Direction.LEFT, getLevelMap(), targetGenerator.getTargets());
                 break;
             case KeyEvent.VK_SPACE:
-                robotController.attack(map);
+                robotController.attack(getLevelMap());
                 break;
             default:
                 if (robotController.getRobot().getAttackStatus())
@@ -186,5 +188,10 @@ public class GameWindow extends RestorableJInternalFrame {
                 }
                 break;
         }
+    }
+
+    public LevelMap getLevelMap()
+    {
+        return map;
     }
 }
