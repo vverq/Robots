@@ -18,12 +18,13 @@ public class GameWindow extends RestorableJInternalFrame {
     private final GameVisualizer m_visualizer;
     private final Robot robot;
     private final RobotController robotController;
-    private final LevelMap map;
     private final TargetGenerator targetGenerator;
     private final EnemyGenerator enemyGenerator;
+    private LevelMap map;
     private StatesKeeper m_keeper;
 
     private final java.util.Timer m_timer = initTimer();
+    private final java.util.Timer m_timerMapsUpdate = initTimer();
 
     private static java.util.Timer initTimer() {
         java.util.Timer timer = new Timer("events generator", true);
@@ -34,8 +35,10 @@ public class GameWindow extends RestorableJInternalFrame {
 
     GameWindow(String title, boolean autoMode, StatesKeeper keeper) throws IOException {
         super(title, true, true, false, true);
+        LevelMap[] maps = new LevelMap[]{new LevelMap("map1.txt"), new LevelMap("map2.txt")};
         robot = new Robot(80, 120, 0, "images/robot.png");
-        map = new LevelMap("map1.txt");
+        // map = new LevelMap("map1.txt");
+        map = maps[0];
         enemyGenerator = new EnemyGenerator(map);
         targetGenerator = new TargetGenerator(map);
         robotController = new RobotController(robot);
@@ -48,6 +51,18 @@ public class GameWindow extends RestorableJInternalFrame {
         setDefaultLocale(JInternalFrame.getDefaultLocale());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         pack();
+
+        m_timerMapsUpdate.schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (robotController.getRobot().getM_robotPositionY() >= 30)
+                        {
+                            System.out.println("hehhe");
+                            map = maps[1];
+                        }
+                    }
+                }, 0 ,10);
 
         if (autoMode) {
             m_timer.schedule(new TimerTask() {

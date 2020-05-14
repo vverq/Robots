@@ -57,11 +57,7 @@ public class GameVisualizer extends JPanel
         super.paint(g);
         Graphics2D g2d = (Graphics2D)g;
         drawMap(g2d);
-        try {
-            drawRobot(g2d);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        drawRobot(g2d);
         drawTarget(g2d);
         drawEnemy(g2d);
     }
@@ -82,7 +78,8 @@ public class GameVisualizer extends JPanel
         }
     }
 
-    private void drawRobot(Graphics2D g) throws IOException {
+    private void drawRobot(Graphics2D g)
+    {
         int robotCenterX = RobotController.round(robot.getM_robotPositionX());
         int robotCenterY = RobotController.round(robot.getM_robotPositionY());
 //        AffineTransform t = AffineTransform.getRotateInstance(robot.getM_robotDirection(), robotCenterX, robotCenterY);

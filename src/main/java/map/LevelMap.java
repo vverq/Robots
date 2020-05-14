@@ -60,6 +60,8 @@ public class LevelMap
     public void addFire(Fire fire) {
         var x = fire.getMiddleX() / BlockMap.getM_width();
         var y = fire.getMiddleY() / BlockMap.getM_height();
+//        var x = fire.getX() / BlockMap.getM_width();
+//        var y = fire.getY() / BlockMap.getM_height();
         if (fireMap[y][x] == null)
             fireMap[y][x] = new ConcurrentLinkedDeque<Fire>();
         fireMap[y][x].addLast(fire);

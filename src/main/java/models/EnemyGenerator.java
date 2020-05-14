@@ -47,8 +47,8 @@ public class EnemyGenerator {
                 x = rnd.nextInt(map.getWidth());
                 y = rnd.nextInt(map.getHeight());
             } while (!blocksMap[y][x].isAvailableForRobot());
-            var newEnemy = new Enemy(blocksMap[y][x].getM_middlePositionX() - 10,
-                    blocksMap[y][x].getM_middlePositionY() - 10, "images/virus.png");
+            var newEnemy = new Enemy(blocksMap[y][x].getM_middlePositionX(),
+                    blocksMap[y][x].getM_middlePositionY(), "images/virus.png");
             enemies.addLast(newEnemy);
             enemyControllers.put(newEnemy, new EnemyController(newEnemy));
         }

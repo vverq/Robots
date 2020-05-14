@@ -213,10 +213,11 @@ public class RobotController
     public void attack(LevelMap map)
     {
         robot.setAttackStatus(true);
-        map.addFire(new Fire(round(robot.getM_robotPositionX() - 50 ), round(robot.getM_robotPositionY()) - 20));
+        map.addFire(new Fire(round(robot.getM_robotPositionX()), round(robot.getM_robotPositionY())));
     }
 
-    private boolean isRobotBurns(BlockMap currentBlock, LevelMap map) {
+    private boolean isRobotBurns(BlockMap currentBlock, LevelMap map)
+    {
         return map.getFireMap()[currentBlock.getM_positionY()][currentBlock.getM_positionX()] != null;
     }
 }

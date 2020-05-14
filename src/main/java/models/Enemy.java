@@ -13,6 +13,7 @@ public class Enemy
     private volatile Image enemyImage;
     private volatile int enemyWidth;
     private volatile int enemyHeight;
+    private volatile boolean isAlive;
 
     public Enemy(int x, int y, String imageName)
     {
@@ -23,6 +24,7 @@ public class Enemy
             enemyImage = ImageIO.read(new File(imageName));
             enemyWidth = enemyImage.getWidth(null);
             enemyHeight = enemyImage.getHeight(null);
+            isAlive = true;
         }
         catch (IOException e)
         {
@@ -63,5 +65,28 @@ public class Enemy
     public int getEnemyHeight()
     {
         return enemyHeight;
+    }
+
+    private void setEnemyImage(String imageName)
+    {
+        try
+        {
+            enemyImage = ImageIO.read(new File(imageName));
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public void killEnemy()
+    {
+        isAlive = false;
+        setEnemyImage("images/cross.png");
+    }
+
+    public boolean isAlive()
+    {
+        return isAlive;
     }
 }
