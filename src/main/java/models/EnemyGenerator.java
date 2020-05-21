@@ -2,7 +2,6 @@ package models;
 
 import map.LevelMap;
 
-import java.beans.PropertyChangeSupport;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Timer;
@@ -55,6 +54,12 @@ public class EnemyGenerator {
     }
 
     public ConcurrentLinkedDeque<Enemy> getEnemies() { return enemies; }
+
+    public void clear()
+    {
+        enemies = new ConcurrentLinkedDeque<Enemy>();
+        enemyControllers = new HashMap<Enemy, EnemyController>();
+    }
 
     public HashMap<Enemy, EnemyController> getEnemyControllers() { return enemyControllers; }
 

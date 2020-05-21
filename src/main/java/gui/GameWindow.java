@@ -22,6 +22,7 @@ public class GameWindow extends RestorableJInternalFrame {
     private final EnemyGenerator enemyGenerator;
     private LevelMap map;
     private StatesKeeper m_keeper;
+    private int countMap;
 
     private final java.util.Timer m_timer = initTimer();
     private final java.util.Timer m_timerMapsUpdate = initTimer();
@@ -33,11 +34,11 @@ public class GameWindow extends RestorableJInternalFrame {
 
     private final java.util.Timer timer1 = initTimer();
 
-    public GameWindow(String title, boolean autoMode, StatesKeeper keeper) throws IOException {
+    GameWindow(String title, boolean autoMode, StatesKeeper keeper) throws IOException {
         super(title, true, true, false, true);
         LevelMap[] maps = new LevelMap[]{new LevelMap("map1.txt"), new LevelMap("map2.txt")};
+        countMap = 0;
         robot = new Robot(80, 120, 0, "images/robot.png");
-        // map = new LevelMap("map1.txt");
         map = maps[0];
         enemyGenerator = new EnemyGenerator(map);
         targetGenerator = new TargetGenerator(map);
@@ -52,16 +53,16 @@ public class GameWindow extends RestorableJInternalFrame {
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         pack();
 
-
-        // ЕСЛИ РАСКОММЕНТИТЬ, ТО ОГОНЬ НЕ РАБОТАЕЕЕЕЕЕЕЕЕТ
         m_timerMapsUpdate.schedule(
                 new TimerTask() {
                     @Override
                     public void run() {
-                        if (robotController.getRobot().getM_robotPositionY() >= 300)
+                        if (robotController.getRobot().getM_robotPositionY() <= 30)
                         {
-                            System.out.println("hehhe");
+                            //countMap+=1;
                             map = maps[1];
+                            enemyGenerator.clear();
+                            targetGenerator.clear();
                             m_visualizer.setMap(map);
                             enemyGenerator.setMap(map);
                             targetGenerator.setMap(map);

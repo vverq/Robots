@@ -7,6 +7,7 @@ import map.LevelMap;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class RobotController
@@ -213,11 +214,13 @@ public class RobotController
     public void attack(LevelMap map)
     {
         robot.setAttackStatus(true);
-        map.addFire(new Fire(round(robot.getM_robotPositionX()), round(robot.getM_robotPositionY())));
+        map.addFire(new Fire(round(robot.getM_robotPositionY()), round(robot.getM_robotPositionX()) - 30));
     }
 
     private boolean isRobotBurns(BlockMap currentBlock, LevelMap map)
     {
+        System.out.println(Arrays.deepToString(map.getFireMap()));
+        //return map.getFireMap()[currentBlock.getM_positionY()][currentBlock.getM_positionX()] != null;
         return map.getFireMap()[currentBlock.getM_positionY()][currentBlock.getM_positionX()] != null;
     }
 }

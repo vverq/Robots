@@ -68,6 +68,11 @@ public class TargetGenerator
         return targets;
     }
 
+    public void clear()
+    {
+        targets = new ConcurrentLinkedDeque<Target>();
+    }
+
     public void setMap(LevelMap map) { this.map = map; }
 
     public void addPropertyChangeListener(PropertyChangeListener pcl)

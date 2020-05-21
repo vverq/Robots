@@ -35,7 +35,7 @@ public class StateDistanceWindow extends StateWindow {
                 + Math.pow(coordinates[1] - target.getM_targetPositionY(), 2));
     }
 
-    private int getShortestDistance() {
+    private int getShortestDistance(ConcurrentLinkedDeque<Target> targets) {
         var shortestDistance = Integer.MAX_VALUE;
         for (Target target : targets) {
             var distance = getDistance(target);
@@ -44,11 +44,15 @@ public class StateDistanceWindow extends StateWindow {
         return shortestDistance;
     }
 
-    private void setDistance() {
-        if (!targets.isEmpty()) {
-            setText(Integer.toString(getShortestDistance() - (int) (robotController.getRobot().getM_robotDiam1() / 2)));
-        } else {
-            setText("N/A");
+    private void setDistance()
+    {
+        var currentTargets = targets;
+        synchronized(currentTargets) {
+            if (!currentTargets.isEmpty()) {
+                setText(Integer.toString(getShortestDistance(currentTargets) - (int) (robotController.getRobot().getM_robotDiam1() / 2)));
+            } else {
+                setText("N/A");
+            }
         }
     }
 

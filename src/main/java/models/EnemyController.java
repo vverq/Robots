@@ -16,12 +16,12 @@ public class EnemyController
     private BlockMap cashTarget;
     private ArrayList<BlockMap> cashPath;
 
-    public EnemyController(ConcurrentLinkedDeque<Enemy> enemies)
-    {
-        this.enemies = enemies;
-    }
+    // public EnemyController(ConcurrentLinkedDeque<Enemy> enemies)
+//    {
+//        this.enemies = enemies;
+//    }
 
-    public EnemyController(Enemy enemy)
+    EnemyController(Enemy enemy)
     {
         this.enemy = enemy;
     }
@@ -33,12 +33,14 @@ public class EnemyController
             var x = round(enemy.getEnemyPositionX()) / BlockMap.getM_width();
             var y = round(enemy.getEnemyPositionY()) / BlockMap.getM_height();
             var currentBlock = map.getMap()[y][x];
-            if (map.getFireMap()[x][y] != null)
+//            if (map.getFireMap()[x][y] != null)
+            if (map.getFireMap()[y][x] != null)
             {
                 enemy.killEnemy();
             }
             BlockMap robotBlock;
-            synchronized (robot) {
+            synchronized (robot)
+            {
                 robotBlock = map.getMap()[(int) robot.getM_robotPositionY() / BlockMap.getM_width()][(int) robot.getM_robotPositionX() / BlockMap.getM_height()];
             }
             int nextBlockX;

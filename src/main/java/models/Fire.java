@@ -12,10 +12,10 @@ public class Fire
     private volatile int x;
     private volatile int y;
 
-    Fire(int x, int y)
+    Fire(int y, int x)
     {
-        this.x = x;
         this.y = y;
+        this.x = x;
     }
 
     public Image getFireImage()
