@@ -10,10 +10,11 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-public class RobotController
+public class RobotController implements PropertyChangeListener
 {
     private static final double maxVelocity = 5;
     private Robot robot;
+    private ConcurrentLinkedDeque<Enemy> enemies = new ConcurrentLinkedDeque<>();
     private EnemyGenerator enemyGenerator;
     private int[] newsCoordinates;
     private PropertyChangeSupport support;
@@ -94,7 +95,13 @@ public class RobotController
             var x = round(robot.getM_robotPositionX()) / BlockMap.getM_width();
             var y = round(robot.getM_robotPositionY()) / BlockMap.getM_height();
             var currentBlock = map.getMap()[y][x];
-
+            for (Enemy enemy: enemies)
+            {
+                if (currentBlock == map.getMap()[enemy.getEnemyPositionY()][enemy.getEnemyPositionX()])
+                {
+                    attack(map);
+                }
+            }
             var targetBlock = map.getMap()[target.getM_blockPositionY()][target.getM_blockPositionX()];
             int nextBlockX;
             int nextBlockY;
@@ -228,6 +235,8 @@ public class RobotController
 
     @Override
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-
+        if (propertyChangeEvent.getPropertyName().equals("newEnemies")) {
+            enemies = (ConcurrentLinkedDeque<Enemy>) propertyChangeEvent.getNewValue();
+        }
     }
 }

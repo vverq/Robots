@@ -42,7 +42,7 @@ public class GameWindow extends RestorableJInternalFrame {
         map = maps[0];
         enemyGenerator = new EnemyGenerator(map);
         targetGenerator = new TargetGenerator(map);
-        robotController = new RobotController(robot);
+        robotController = new RobotController(robot, enemyGenerator);
         m_visualizer = new GameVisualizer(autoMode, robot, robotController, targetGenerator, enemyGenerator, map);
         m_keeper = keeper;
         m_keeper.register(this, "GameWindow");
