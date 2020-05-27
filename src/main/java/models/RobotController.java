@@ -4,24 +4,27 @@ import gui.GameWindow;
 import map.BlockMap;
 import map.LevelMap;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class RobotController
 {
     private static final double maxVelocity = 5;
     private Robot robot;
+    private EnemyGenerator enemyGenerator;
     private int[] newsCoordinates;
     private PropertyChangeSupport support;
     private BlockMap cashTarget;
     private ArrayList<BlockMap> cashPath;
 
-    public RobotController(Robot CRobot)
+    public RobotController(Robot CRobot, EnemyGenerator enemyGenerator)
     {
         robot = CRobot;
+        this.enemyGenerator = enemyGenerator;
+        enemyGenerator.addPropertyChangeListener((PropertyChangeListener) this);
         support = new PropertyChangeSupport(this);
     }
 
@@ -91,6 +94,7 @@ public class RobotController
             var x = round(robot.getM_robotPositionX()) / BlockMap.getM_width();
             var y = round(robot.getM_robotPositionY()) / BlockMap.getM_height();
             var currentBlock = map.getMap()[y][x];
+
             var targetBlock = map.getMap()[target.getM_blockPositionY()][target.getM_blockPositionX()];
             int nextBlockX;
             int nextBlockY;
@@ -219,8 +223,11 @@ public class RobotController
 
     private boolean isRobotBurns(BlockMap currentBlock, LevelMap map)
     {
-        System.out.println(Arrays.deepToString(map.getFireMap()));
-        //return map.getFireMap()[currentBlock.getM_positionY()][currentBlock.getM_positionX()] != null;
         return map.getFireMap()[currentBlock.getM_positionY()][currentBlock.getM_positionX()] != null;
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+
     }
 }
