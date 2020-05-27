@@ -97,7 +97,7 @@ public class RobotController implements PropertyChangeListener
             var currentBlock = map.getMap()[y][x];
             for (Enemy enemy: enemies)
             {
-                if (currentBlock == map.getMap()[enemy.getEnemyPositionY()][enemy.getEnemyPositionX()])
+                if (currentBlock == map.getMap()[round(enemy.getEnemyPositionY()) / BlockMap.getM_width()][round(enemy.getEnemyPositionX()) / BlockMap.getM_height()])
                 {
                     attack(map);
                 }
