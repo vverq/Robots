@@ -2,6 +2,7 @@ package models;
 
 import map.LevelMap;
 
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.HashMap;
 import java.util.Random;
@@ -10,6 +11,7 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class EnemyGenerator {
+    private PropertyChangeSupport support;
     private Random rnd = new Random();
     private final Timer m_timer = initTimer();
     private static Timer initTimer()
@@ -24,6 +26,7 @@ public class EnemyGenerator {
     public EnemyGenerator (LevelMap map)
     {
         this.map = map;
+        support = new PropertyChangeSupport(this);
         m_timer.schedule(new TimerTask()
         {
             @Override
@@ -52,11 +55,33 @@ public class EnemyGenerator {
             enemies.addLast(newEnemy);
             enemyControllers.put(newEnemy, new EnemyController(newEnemy));
         }
+        updateEnemies();
     }
 
     public ConcurrentLinkedDeque<Enemy> getEnemies() { return enemies; }
 
+    public void clear()
+    {
+        enemies = new ConcurrentLinkedDeque<Enemy>();
+        enemyControllers = new HashMap<Enemy, EnemyController>();
+    }
+
     public HashMap<Enemy, EnemyController> getEnemyControllers() { return enemyControllers; }
 
     public void setMap(LevelMap map) { this.map = map; }
+
+    public void addPropertyChangeListener(PropertyChangeListener pcl)
+    {
+        support.addPropertyChangeListener(pcl);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener pcl)
+    {
+        support.removePropertyChangeListener(pcl);
+    }
+
+    private void updateEnemies()
+    {
+        support.firePropertyChange("newEnemies", null, enemies);
+    }
 }

@@ -10,18 +10,18 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class EnemyController
 {
-    private static final double maxVelocity = 2;
+    private static final double maxVelocity = 1;
     private ConcurrentLinkedDeque<Enemy> enemies;
     private Enemy enemy;
     private BlockMap cashTarget;
     private ArrayList<BlockMap> cashPath;
 
-    public EnemyController(ConcurrentLinkedDeque<Enemy> enemies)
-    {
-        this.enemies = enemies;
-    }
+    // public EnemyController(ConcurrentLinkedDeque<Enemy> enemies)
+//    {
+//        this.enemies = enemies;
+//    }
 
-    public EnemyController(Enemy enemy)
+    EnemyController(Enemy enemy)
     {
         this.enemy = enemy;
     }
@@ -33,12 +33,14 @@ public class EnemyController
             var x = round(enemy.getEnemyPositionX()) / BlockMap.getM_width();
             var y = round(enemy.getEnemyPositionY()) / BlockMap.getM_height();
             var currentBlock = map.getMap()[y][x];
-            if (map.getFireMap()[x][y] != null)
+//            if (map.getFireMap()[x][y] != null)
+            if (map.getFireMap()[y][x] != null)
             {
                 enemy.killEnemy();
             }
             BlockMap robotBlock;
-            synchronized (robot) {
+            synchronized (robot)
+            {
                 robotBlock = map.getMap()[(int) robot.getM_robotPositionY() / BlockMap.getM_width()][(int) robot.getM_robotPositionX() / BlockMap.getM_height()];
             }
             int nextBlockX;
@@ -101,11 +103,13 @@ public class EnemyController
     private static boolean isEnemyNearToRobot(
             Robot robot, double enemyX, double enemyY, double robotDiam1, double robotDiam2)
     {
-        var robotX = robot.getM_robotPositionX();
-        var robotY = robot.getM_robotPositionY();
+        var robotX = round(robot.getM_robotPositionX());
+        var robotY = round(robot.getM_robotPositionY());
         enemyX = round(enemyX);
         enemyY = round(enemyY);
-        return robotX <= enemyX + robotDiam1 / 2 && robotX >= enemyX - robotDiam1 / 2
-                && robotY <= enemyY + robotDiam2 / 2 && robotY >= enemyY - robotDiam2 / 2;
+        return (round(robotX / BlockMap.getM_width()) == round(enemyX / BlockMap.getM_width()) &&
+                round(robotY / BlockMap.getM_height()) == round(enemyY / BlockMap.getM_height())) ||
+                (robotX <= enemyX + robotDiam1 / 2 && robotX >= enemyX - robotDiam1 / 2
+                && robotY <= enemyY + robotDiam2 / 2 && robotY >= enemyY - robotDiam2 / 2);
     }
 }

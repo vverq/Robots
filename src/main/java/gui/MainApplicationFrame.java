@@ -86,6 +86,7 @@ public class MainApplicationFrame extends JFrame
         {
             Logger.error(e.toString());
         }
+        gameWindow.startGame();
     }
 
     private DialogWindow createRestoreWarningWindow()

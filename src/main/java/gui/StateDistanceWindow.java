@@ -44,7 +44,8 @@ public class StateDistanceWindow extends StateWindow {
         return shortestDistance;
     }
 
-    private void setDistance() {
+    private void setDistance()
+    {
         var currentTargets = targets;
         synchronized(currentTargets) {
             if (!currentTargets.isEmpty()) {

@@ -12,7 +12,7 @@ public class LevelMap
     private int width;
     private int height;
     private BlockMap[][] map;
-    private ConcurrentLinkedDeque[][] fireMap;
+    private Fire[][] fireMap;
     private volatile ConcurrentLinkedDeque<Fire> fires;
     public GraphFromMap graph;
 
@@ -26,7 +26,7 @@ public class LevelMap
             width = Integer.parseInt(strMapSize[0]);
             height = Integer.parseInt(strMapSize[1]);
             map = new BlockMap[height][width];
-            fireMap = new ConcurrentLinkedDeque[height][width];
+            fireMap = new Fire[height][width];
             graph = new GraphFromMap(this);
             while (sc.hasNext())
             {
@@ -62,15 +62,16 @@ public class LevelMap
         var y = fire.getMiddleY() / BlockMap.getM_height();
 //        var x = fire.getX() / BlockMap.getM_width();
 //        var y = fire.getY() / BlockMap.getM_height();
-        if (fireMap[y][x] == null)
-            fireMap[y][x] = new ConcurrentLinkedDeque<Fire>();
-        fireMap[y][x].addLast(fire);
-        fires.addLast(fire);
+        if (fireMap[y][x] == null) {
+            fireMap[y][x] = fire;
+            fires.addLast(fire);
+        }
+        map[y][x].setNotAvailableForRobot();
     }
 
     public BlockMap[][] getMap() { return map; }
 
-    public ConcurrentLinkedDeque[][] getFireMap() { return fireMap; }
+    public Fire[][] getFireMap() { return fireMap; }
 
     public ConcurrentLinkedDeque<Fire> getFires() { return fires; }
 

@@ -22,6 +22,9 @@ public class GameWindow extends RestorableJInternalFrame {
     private final EnemyGenerator enemyGenerator;
     private LevelMap map;
     private StatesKeeper m_keeper;
+    private int countMap;
+    private LevelMap[] maps;
+    private boolean autoMode;
 
     private final java.util.Timer m_timer = initTimer();
     private final java.util.Timer m_timerMapsUpdate = initTimer();
@@ -33,15 +36,16 @@ public class GameWindow extends RestorableJInternalFrame {
 
     private final java.util.Timer timer1 = initTimer();
 
-    public GameWindow(String title, boolean autoMode, StatesKeeper keeper) throws IOException {
+    GameWindow(String title, boolean autoMode, StatesKeeper keeper) throws IOException {
         super(title, true, true, false, true);
-        LevelMap[] maps = new LevelMap[]{new LevelMap("map1.txt"), new LevelMap("map2.txt")};
+        maps = new LevelMap[]{new LevelMap("map1.txt"), new LevelMap("map2.txt")};
+        this.autoMode = autoMode;
+        countMap = 0;
         robot = new Robot(80, 120, 0, "images/robot.png");
-        // map = new LevelMap("map1.txt");
         map = maps[0];
         enemyGenerator = new EnemyGenerator(map);
         targetGenerator = new TargetGenerator(map);
-        robotController = new RobotController(robot);
+        robotController = new RobotController(robot, enemyGenerator);
         m_visualizer = new GameVisualizer(autoMode, robot, robotController, targetGenerator, enemyGenerator, map);
         m_keeper = keeper;
         m_keeper.register(this, "GameWindow");
@@ -52,39 +56,6 @@ public class GameWindow extends RestorableJInternalFrame {
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         pack();
 
-
-        // ЕСЛИ РАСКОММЕНТИТЬ, ТО ОГОНЬ НЕ РАБОТАЕЕЕЕЕЕЕЕЕТ
-        m_timerMapsUpdate.schedule(
-                new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (robotController.getRobot().getM_robotPositionY() >= 300)
-                        {
-                            System.out.println("hehhe");
-                            map = maps[1];
-                            m_visualizer.setMap(map);
-                            enemyGenerator.setMap(map);
-                            targetGenerator.setMap(map);
-                        }
-                    }
-                }, 0 ,100);
-
-        if (autoMode) {
-            m_timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    robotController.autoMoveRobot(targetGenerator.getTargets(), getLevelMap());
-                }
-            }, 0, 100);
-        }
-
-        m_timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                for (EnemyController enemyController : enemyGenerator.getEnemyControllers().values())
-                    enemyController.moveEnemy(robot, map);
-            }
-        }, 0, 100);
 
         var visualizer = this;
 //        if (!autoMode) {
@@ -138,6 +109,42 @@ public class GameWindow extends RestorableJInternalFrame {
         super.dispose();
     }
 
+    public void startGame() {
+        m_timerMapsUpdate.schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (robotController.getRobot().getM_robotPositionY() <= 30)
+                        {
+                            //countMap+=1;
+                            map = maps[1];
+                            enemyGenerator.clear();
+                            targetGenerator.clear();
+                            m_visualizer.setMap(map);
+                            enemyGenerator.setMap(map);
+                            targetGenerator.setMap(map);
+                        }
+                    }
+                }, 0 ,100);
+
+        if (autoMode) {
+            m_timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    robotController.autoMoveRobot(targetGenerator.getTargets(), getLevelMap());
+                }
+            }, 0, 100);
+        }
+
+        m_timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                for (EnemyController enemyController : enemyGenerator.getEnemyControllers().values())
+                    enemyController.moveEnemy(robot, map);
+            }
+        }, 0, 100);
+    }
+
     void updateNames(Locale locale)
     {
         var bundle = ResourceBundle.getBundle("MainApplicationFrameBundle", locale);
@@ -182,7 +189,7 @@ public class GameWindow extends RestorableJInternalFrame {
                 robotController.moveRobot(Direction.LEFT, getLevelMap(), targetGenerator.getTargets());
                 break;
             case KeyEvent.VK_SPACE:
-                robotController.attack(getLevelMap());
+                robotController.attack(getLevelMap(), 0, 0);
                 break;
             default:
                 if (robotController.getRobot().getAttackStatus())

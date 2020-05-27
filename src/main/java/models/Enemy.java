@@ -15,7 +15,7 @@ public class Enemy
     private volatile int enemyHeight;
     private volatile boolean isAlive;
 
-    public Enemy(int x, int y, String imageName)
+    Enemy(int x, int y, String imageName)
     {
         try
         {
@@ -32,12 +32,12 @@ public class Enemy
         }
     }
 
-    public void setEnemyPositionX(int x)
+    void setEnemyPositionX(int x)
     {
         enemyPositionX = x;
     }
 
-    public void setEnemyPositionY(int y)
+    void setEnemyPositionY(int y)
     {
         enemyPositionY = y;
     }
@@ -62,7 +62,7 @@ public class Enemy
         return enemyWidth;
     }
 
-    public int getEnemyHeight()
+    int getEnemyHeight()
     {
         return enemyHeight;
     }
@@ -79,13 +79,13 @@ public class Enemy
         }
     }
 
-    public void killEnemy()
+    void killEnemy()
     {
         isAlive = false;
         setEnemyImage("images/cross.png");
     }
 
-    public boolean isAlive()
+    boolean isAlive()
     {
         return isAlive;
     }

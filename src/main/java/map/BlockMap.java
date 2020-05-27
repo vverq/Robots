@@ -40,6 +40,8 @@ public class BlockMap
 
     public boolean isAvailableForRobot() { return m_isAvailable; }
 
+    public void setNotAvailableForRobot() { m_isAvailable = false; }
+
     void setImage(Image image) { m_image = image; }
 
     public Image getImage() { return m_image; }

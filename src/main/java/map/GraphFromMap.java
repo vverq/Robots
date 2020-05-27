@@ -38,7 +38,7 @@ public class GraphFromMap
                     || y < 0 || y>= map.getHeight())
                         continue;
                     var nextBlock = blocksMap[y][x];
-                    if (!nextBlock.isAvailableForRobot())
+                    if (isItRobot && !nextBlock.isAvailableForRobot())
                         continue;
                     if (visited.contains(nextBlock))
                         continue;

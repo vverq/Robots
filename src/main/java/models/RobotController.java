@@ -4,23 +4,28 @@ import gui.GameWindow;
 import map.BlockMap;
 import map.LevelMap;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-public class RobotController
+public class RobotController implements PropertyChangeListener
 {
     private static final double maxVelocity = 5;
     private Robot robot;
+    private ConcurrentLinkedDeque<Enemy> enemies = new ConcurrentLinkedDeque<>();
+    private EnemyGenerator enemyGenerator;
     private int[] newsCoordinates;
     private PropertyChangeSupport support;
     private BlockMap cashTarget;
     private ArrayList<BlockMap> cashPath;
 
-    public RobotController(Robot CRobot)
+    public RobotController(Robot CRobot, EnemyGenerator enemyGenerator)
     {
         robot = CRobot;
+        this.enemyGenerator = enemyGenerator;
+        enemyGenerator.addPropertyChangeListener((PropertyChangeListener) this);
         support = new PropertyChangeSupport(this);
     }
 
@@ -90,6 +95,17 @@ public class RobotController
             var x = round(robot.getM_robotPositionX()) / BlockMap.getM_width();
             var y = round(robot.getM_robotPositionY()) / BlockMap.getM_height();
             var currentBlock = map.getMap()[y][x];
+            for (Enemy enemy: enemies)
+            {
+                if (!enemy.isAlive())
+                    continue;
+                var enemyX = round(enemy.getEnemyPositionX() / BlockMap.getM_height());
+                var enemyY = round(enemy.getEnemyPositionY() / BlockMap.getM_width());
+                if (Math.abs(x - enemyX) <= 1 && Math.abs(y - enemyY) <= 1)
+                {
+                    attack(map, (enemyX - x) * 30, (y - enemyY) * 30);
+                }
+            }
             var targetBlock = map.getMap()[target.getM_blockPositionY()][target.getM_blockPositionX()];
             int nextBlockX;
             int nextBlockY;
@@ -210,14 +226,21 @@ public class RobotController
         return robot;
     }
 
-    public void attack(LevelMap map)
+    public void attack(LevelMap map, int x, int y)
     {
         robot.setAttackStatus(true);
-        map.addFire(new Fire(round(robot.getM_robotPositionX()), round(robot.getM_robotPositionY())));
+        map.addFire(new Fire(round(robot.getM_robotPositionY() + x), round(robot.getM_robotPositionX()) + y));
     }
 
     private boolean isRobotBurns(BlockMap currentBlock, LevelMap map)
     {
         return map.getFireMap()[currentBlock.getM_positionY()][currentBlock.getM_positionX()] != null;
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+        if (propertyChangeEvent.getPropertyName().equals("newEnemies")) {
+            enemies = (ConcurrentLinkedDeque<Enemy>) propertyChangeEvent.getNewValue();
+        }
     }
 }
