@@ -24,11 +24,11 @@ public class TargetGenerator
     private LevelMap map;
     private final HashMap<Integer, String> targetImages = new HashMap<>();
     {
-        targetImages.put(0,"images/cake.png");
-        targetImages.put(1, "images/cherry.png");
-        targetImages.put(2, "images/pancake.png");
-        targetImages.put(3, "images/ramen.png");
-        targetImages.put(4, "images/yogurt.png");
+        targetImages.put(0,"src/main/resources/images/cake.png");
+        targetImages.put(1, "src/main/resources/images/cherry.png");
+        targetImages.put(2, "src/main/resources/images/pancake.png");
+        targetImages.put(3, "src/main/resources/images/ramen.png");
+        targetImages.put(4, "src/main/resources/images/yogurt.png");
     }
 
     public TargetGenerator(LevelMap map)

@@ -82,7 +82,7 @@ public class Enemy
     void killEnemy()
     {
         isAlive = false;
-        setEnemyImage("images/cross.png");
+        setEnemyImage("src/main/resources/images/cross.png");
     }
 
     boolean isAlive()

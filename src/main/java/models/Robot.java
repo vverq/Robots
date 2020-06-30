@@ -94,7 +94,7 @@ public class Robot
 
     void killRobot()
     {
-        setM_robotImage("images/deadCat.png");
+        setM_robotImage("src/main/resources/images/deadCat.png");
         isAlive = false;
     }
 

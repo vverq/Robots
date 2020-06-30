@@ -35,7 +35,7 @@ public class MainApplicationFrame extends JFrame
 
     MainApplicationFrame()
     {
-        keeper = new StatesKeeper(new File("framesProperties.json"));
+        keeper = new StatesKeeper(new File("src/main/resources/framesProperties.json"));
         setLocationRelativeTo(null);
         setContentPane(desktopPane);
         setMinimumSize(new Dimension(750,600));

@@ -6,7 +6,7 @@ import java.awt.*;
 
 public class Fire
 {
-    private volatile Image fireImage = new ImageIcon("images/fire.gif").getImage();
+    private volatile Image fireImage = new ImageIcon("src/main/resources/images/fire.gif").getImage();
     private volatile int height = fireImage.getHeight(null);
     private volatile int width = fireImage.getWidth(null);
     private volatile int x;

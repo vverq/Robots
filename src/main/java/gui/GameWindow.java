@@ -36,9 +36,9 @@ public class GameWindow extends RestorableJInternalFrame {
 
     GameWindow(String title, boolean autoMode, StatesKeeper keeper) throws IOException {
         super(title, true, true, false, true);
-        LevelMap[] maps = new LevelMap[]{new LevelMap("map1.txt"), new LevelMap("map2.txt")};
+        LevelMap[] maps = new LevelMap[]{new LevelMap("src/main/resources/maps/map1.txt"), new LevelMap("src/main/resources/maps/map2.txt")};
         countMap = 0;
-        robot = new Robot(80, 120, 0, "images/robot.png");
+        robot = new Robot(80, 120, 0, "src/main/resources/images/robot.png");
         map = maps[0];
         enemyGenerator = new EnemyGenerator(map);
         targetGenerator = new TargetGenerator(map);

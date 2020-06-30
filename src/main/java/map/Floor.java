@@ -14,8 +14,8 @@ public class Floor extends BlockMap
 
     private final HashMap<String, String> images = new HashMap<>();
     {
-        images.put("wood", "images/wood.png");
-        images.put("gravel", "images/gravel.png");
+        images.put("wood", "src/main/resources/images/wood.png");
+        images.put("gravel", "src/main/resources/images/gravel.png");
     };
 
     Floor(int x, int y, String imageName)
