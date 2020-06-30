@@ -4,6 +4,7 @@ The project to learn OO design concepts and MDI application development in Java
 <img src="images/allView.JPG" weigth=250 height=250 /> 
 <img src="images/Cat.JPG" alt="cat" weigth=250 height=250 />
 <img src="images/deadCat.JPG" alt="dead cat" weigth=250 height=250 /> 
+<img src="images/Fire.JPG" alt="dead cat" weigth=250 height=250 /> 
 
 # TODO:
 * [X] add maven
