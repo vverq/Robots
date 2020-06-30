@@ -32,6 +32,3 @@ ___
 * [X] add maps and teach the robot to run by them
 * [ ] use logs to describe actions
 * [ ] add treasures
-
-
-optimize threads? Atomic classes?
