@@ -1,7 +1,6 @@
 package gui;
 
 import java.awt.*;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.Locale;
@@ -10,35 +9,41 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.*;
-import models.Robot;
-import models.RobotController;
-import models.LevelMap;
-import models.TargetGenerator;
 
-public class GameWindow extends RestorableJInternalFrame
-{
-    private final GameVisualizer m_visualizer;
+import models.*;
+import map.LevelMap;
+import models.Robot;
+
+public class GameWindow extends RestorableJInternalFrame {
+    private GameVisualizer m_visualizer;
     private final Robot robot;
     private final RobotController robotController;
-    private final LevelMap map;
     private final TargetGenerator targetGenerator;
+    private final EnemyGenerator enemyGenerator;
+    private LevelMap map;
     private StatesKeeper m_keeper;
+    private int countMap;
 
     private final java.util.Timer m_timer = initTimer();
-    private static java.util.Timer initTimer()
-    {
+    private final java.util.Timer m_timerMapsUpdate = initTimer();
+
+    private static java.util.Timer initTimer() {
         java.util.Timer timer = new Timer("events generator", true);
         return timer;
     }
 
-    GameWindow(String title, boolean autoMode, StatesKeeper keeper) throws IOException
-    {
+    private final java.util.Timer timer1 = initTimer();
+
+    GameWindow(String title, boolean autoMode, StatesKeeper keeper) throws IOException {
         super(title, true, true, false, true);
-        robot = new Robot(80, 120, 0, "images/robot.png");
-        map = new LevelMap("map1.txt");
+        LevelMap[] maps = new LevelMap[]{new LevelMap("src/main/resources/maps/map1.txt"), new LevelMap("src/main/resources/maps/map2.txt")};
+        countMap = 0;
+        robot = new Robot(80, 120, 0, "src/main/resources/images/robot.png");
+        map = maps[0];
+        enemyGenerator = new EnemyGenerator(map);
         targetGenerator = new TargetGenerator(map);
-        robotController = new RobotController(robot);
-        m_visualizer = new GameVisualizer(autoMode, robot, map, robotController, targetGenerator);
+        robotController = new RobotController(robot, enemyGenerator);
+        m_visualizer = new GameVisualizer(autoMode, robot, robotController, targetGenerator, enemyGenerator, map);
         m_keeper = keeper;
         m_keeper.register(this, "GameWindow");
         JPanel panel = new JPanel(new BorderLayout());
@@ -48,25 +53,66 @@ public class GameWindow extends RestorableJInternalFrame
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         pack();
 
-        if (autoMode)
-        {
+        m_timerMapsUpdate.schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (robotController.getRobot().getM_robotPositionY() <= 30)
+                        {
+                            //countMap+=1;
+                            map = maps[1];
+                            enemyGenerator.clear();
+                            targetGenerator.clear();
+                            m_visualizer.setMap(map);
+                            enemyGenerator.setMap(map);
+                            targetGenerator.setMap(map);
+                        }
+                    }
+                }, 0 ,100);
+
+        if (autoMode) {
             m_timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    robotController.autoMoveRobot(targetGenerator.getTargets(), map);
+                    robotController.autoMoveRobot(targetGenerator.getTargets(), getLevelMap());
                 }
             }, 0, 100);
         }
 
+        m_timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                for (EnemyController enemyController : enemyGenerator.getEnemyControllers().values())
+                    enemyController.moveEnemy(robot, map);
+            }
+        }, 0, 100);
+
         var visualizer = this;
-        if (!autoMode) {
-            this.addKeyListener(new KeyAdapter() {
-                @Override
-                public void keyPressed(KeyEvent keyEvent) {
-                    visualizer.processKeyEvent(keyEvent);
-                }
-            });
-        }
+//        if (!autoMode) {
+//            this.addKeyListener(new KeyAdapter() {
+//                @Override
+//                public void keyPressed(KeyEvent keyEvent) {
+//                    if (!isMoving.get()) {
+//                        isMoving.set(true);
+//                        while (true) {
+////                            visualizer.processKeyEvent(keyEvent);
+//                        }
+//                    }
+//                }
+//
+//                @Override
+//                public void keyReleased(KeyEvent e) {
+//                    isMoving.set(false);
+//                }
+//            });
+//    }
+
+//        timer1.schedule(new TimerTask() {
+//                             @Override
+//                             public void run() {
+//                                 enemyController.moveEnemy(robot, map);
+//                             }
+//                         }, 0, 1000);
         setFocusable(true);
     }
 
@@ -100,26 +146,56 @@ public class GameWindow extends RestorableJInternalFrame
         setTitle(bundle.getString("gameWindowTitle"));
     }
 
+    @Override
     protected void processKeyEvent(KeyEvent keyEvent) {
+        // todo навести красоту в этом методе, эти ифы в каждом кейсе не оч
         switch (keyEvent.getKeyCode()) {
             case KeyEvent.VK_DOWN:
+                if (robotController.getRobot().getAttackStatus())
+                {
+                    robotController.getRobot().setAttackStatus(false);
+                }
                 robotController.setRobotDirection(Direction.DOWN, robot);
-                robotController.moveRobot(Direction.DOWN, map, targetGenerator.getTargets());
+                robotController.moveRobot(Direction.DOWN, getLevelMap(), targetGenerator.getTargets());
                 break;
             case KeyEvent.VK_UP:
+                if (robotController.getRobot().getAttackStatus())
+                {
+                    robotController.getRobot().setAttackStatus(false);
+                }
                 robotController.setRobotDirection(Direction.UP, robot);
-                robotController.moveRobot(Direction.UP, map, targetGenerator.getTargets());
+                robotController.moveRobot(Direction.UP, getLevelMap(), targetGenerator.getTargets());
                 break;
             case KeyEvent.VK_RIGHT:
+                if (robotController.getRobot().getAttackStatus())
+                {
+                    robotController.getRobot().setAttackStatus(false);
+                }
                 robotController.setRobotDirection(Direction.RIGHT, robot);
-                robotController.moveRobot(Direction.RIGHT, map, targetGenerator.getTargets());
+                robotController.moveRobot(Direction.RIGHT, getLevelMap(), targetGenerator.getTargets());
                 break;
             case KeyEvent.VK_LEFT:
+                if (robotController.getRobot().getAttackStatus())
+                {
+                    robotController.getRobot().setAttackStatus(false);
+                }
                 robotController.setRobotDirection(Direction.LEFT, robot);
-                robotController.moveRobot(Direction.LEFT, map, targetGenerator.getTargets());
+                robotController.moveRobot(Direction.LEFT, getLevelMap(), targetGenerator.getTargets());
+                break;
+            case KeyEvent.VK_SPACE:
+                robotController.attack(getLevelMap());
                 break;
             default:
+                if (robotController.getRobot().getAttackStatus())
+                {
+                    robotController.getRobot().setAttackStatus(false);
+                }
                 break;
         }
+    }
+
+    public LevelMap getLevelMap()
+    {
+        return map;
     }
 }

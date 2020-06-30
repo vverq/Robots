@@ -1,12 +1,16 @@
 package gui;
 
+import map.LevelMap;
 import models.*;
 import models.Robot;
+import map.BlockMap;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.io.IOException;
 import java.util.*;
-import javax.swing.JPanel;
+import java.util.Timer;
+import javax.swing.*;
 
 
 public class GameVisualizer extends JPanel
@@ -18,17 +22,19 @@ public class GameVisualizer extends JPanel
         return timer;
     }
     private Robot robot;
-    private LevelMap map;
+    private EnemyGenerator enemyGenerator;
     private RobotController robotController;
     private TargetGenerator targetGenerator;
+    private LevelMap map;
 
-    GameVisualizer(boolean autoMode, Robot robot, LevelMap map, RobotController robotController,
-                   TargetGenerator targetGenerator)
+    GameVisualizer(boolean autoMode, Robot robot, RobotController robotController,
+                   TargetGenerator targetGenerator, EnemyGenerator enemyGenerator, LevelMap map)
     {
-        this.robot = robot;
         this.map = map;
+        this.robot = robot;
         this.robotController = robotController;
         this.targetGenerator = targetGenerator;
+        this.enemyGenerator = enemyGenerator;
         m_timer.schedule(new TimerTask()
         {
             @Override
@@ -36,7 +42,7 @@ public class GameVisualizer extends JPanel
             {
                 onRedrawEvent();
             }
-        }, 0, 50);
+        }, 0, 1);
         setDoubleBuffered(true);
     }
 
@@ -53,6 +59,11 @@ public class GameVisualizer extends JPanel
         drawMap(g2d);
         drawRobot(g2d);
         drawTarget(g2d);
+        drawEnemy(g2d);
+    }
+
+    protected void setMap(LevelMap map) {
+        this.map = map;
     }
 
     private void drawMap(Graphics2D g)
@@ -64,8 +75,8 @@ public class GameVisualizer extends JPanel
                 var block = map.getMap()[i][j];
                 g.drawImage(
                         block.getImage(),
-                        block.getM_positionX() * Block.getM_width(),
-                        block.getM_positionY() * Block.getM_height(),
+                        block.getM_positionX() * BlockMap.getM_width(),
+                        block.getM_positionY() * BlockMap.getM_height(),
                         null);
             }
         }
@@ -75,15 +86,23 @@ public class GameVisualizer extends JPanel
     {
         int robotCenterX = RobotController.round(robot.getM_robotPositionX());
         int robotCenterY = RobotController.round(robot.getM_robotPositionY());
-        AffineTransform t = AffineTransform.getRotateInstance(robot.getM_robotDirection(), robotCenterX, robotCenterY);
-        g.setTransform(t);
+//        AffineTransform t = AffineTransform.getRotateInstance(robot.getM_robotDirection(), robotCenterX, robotCenterY);
+//        g.setTransform(t);
         g.drawImage(
                 robot.getM_robotImage(),
                 robotCenterX - robot.getM_robotImage().getHeight(null) / 2,
                 robotCenterY - robot.getM_robotImage().getWidth(null) / 2,
                 null
         );
+        if (map.getFires().size() > 0)
+        {
+            for (Fire fire: map.getFires())
+            {
+                g.drawImage(fire.getFireImage(), fire.getX(), fire.getY(), null);
+            }
+        }
     }
+
 
     private void drawTarget(Graphics2D g)
     {
@@ -95,6 +114,20 @@ public class GameVisualizer extends JPanel
                     target.getM_targetImage(),
                     target.getM_targetPositionX(),
                     target.getM_targetPositionY(),
+                    null
+            );
+        }
+    }
+
+    private void drawEnemy(Graphics2D g)
+    {
+        for (Enemy enemy : enemyGenerator.getEnemies()) {
+            int enemyCenterX = EnemyController.round(enemy.getEnemyPositionX());
+            int enemyCenterY = EnemyController.round(enemy.getEnemyPositionY());
+            g.drawImage(
+                    enemy.getEnemyImage(),
+                    enemyCenterX - enemy.getEnemyImage().getHeight(null) / 2,
+                    enemyCenterY - enemy.getEnemyImage().getWidth(null) / 2,
                     null
             );
         }

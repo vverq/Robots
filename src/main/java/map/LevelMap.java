@@ -1,25 +1,32 @@
-package models;
+package map;
+
+import models.Fire;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class LevelMap
 {
     private int width;
     private int height;
-    private Block[][] map;
-    GraphFromMap graph;
+    private BlockMap[][] map;
+    private ConcurrentLinkedDeque[][] fireMap;
+    private volatile ConcurrentLinkedDeque<Fire> fires;
+    public GraphFromMap graph;
 
     public LevelMap(String filename)
     {
+        fires = new ConcurrentLinkedDeque<Fire>();
         try
         {
             Scanner sc = new Scanner(new File(filename));
             var strMapSize = sc.nextLine().split(" ");
             width = Integer.parseInt(strMapSize[0]);
             height = Integer.parseInt(strMapSize[1]);
-            map = new Block[height][width];
+            map = new BlockMap[height][width];
+            fireMap = new ConcurrentLinkedDeque[height][width];
             graph = new GraphFromMap(this);
             while (sc.hasNext())
             {
@@ -50,5 +57,25 @@ public class LevelMap
 
     public int getHeight() { return height; }
 
-    public Block[][] getMap() { return map; }
+    public void addFire(Fire fire) {
+        var x = fire.getMiddleX() / BlockMap.getM_width();
+        var y = fire.getMiddleY() / BlockMap.getM_height();
+//        var x = fire.getX() / BlockMap.getM_width();
+//        var y = fire.getY() / BlockMap.getM_height();
+        if (fireMap[y][x] == null)
+            fireMap[y][x] = new ConcurrentLinkedDeque<Fire>();
+        fireMap[y][x].addLast(fire);
+        fires.addLast(fire);
+    }
+
+    public BlockMap[][] getMap() { return map; }
+
+    public ConcurrentLinkedDeque[][] getFireMap() { return fireMap; }
+
+    public ConcurrentLinkedDeque<Fire> getFires() { return fires; }
+
+//    public FireMap[][] getFireMap()
+//    {
+//        return fireMap;
+//    }
 }

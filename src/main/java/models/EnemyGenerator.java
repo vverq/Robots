@@ -2,16 +2,15 @@ package models;
 
 import map.LevelMap;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 
-public class TargetGenerator
-{
+public class EnemyGenerator {
     private PropertyChangeSupport support;
     private Random rnd = new Random();
     private final Timer m_timer = initTimer();
@@ -20,18 +19,11 @@ public class TargetGenerator
         Timer timer = new Timer("events generator", true);
         return timer;
     }
-    private ConcurrentLinkedDeque<Target> targets = new ConcurrentLinkedDeque<>();
+    private ConcurrentLinkedDeque<Enemy> enemies = new ConcurrentLinkedDeque<>();
+    private HashMap<Enemy, EnemyController> enemyControllers = new HashMap();
     private LevelMap map;
-    private final HashMap<Integer, String> targetImages = new HashMap<>();
-    {
-        targetImages.put(0,"src/main/resources/images/cake.png");
-        targetImages.put(1, "src/main/resources/images/cherry.png");
-        targetImages.put(2, "src/main/resources/images/pancake.png");
-        targetImages.put(3, "src/main/resources/images/ramen.png");
-        targetImages.put(4, "src/main/resources/images/yogurt.png");
-    }
 
-    public TargetGenerator(LevelMap map)
+    public EnemyGenerator (LevelMap map)
     {
         this.map = map;
         support = new PropertyChangeSupport(this);
@@ -40,15 +32,15 @@ public class TargetGenerator
             @Override
             public void run()
             {
-                onTargetUpdateEvent();
+                onEnemyUpdateEvent();
             }
-        }, 0, 1000);
+        }, 0, 10000);
     }
 
-    private void onTargetUpdateEvent()
+    private void onEnemyUpdateEvent()
     {
-        int maxCountTargets = 5;
-        int countNewTargets = rnd.nextInt(maxCountTargets - targets.size() + 1);
+        int maxCountTargets = 3;
+        int countNewTargets = rnd.nextInt(maxCountTargets - enemies.size() + 1);
         var blocksMap = map.getMap();
         for (var i = 0; i < countNewTargets; i++)
         {
@@ -58,20 +50,22 @@ public class TargetGenerator
                 x = rnd.nextInt(map.getWidth());
                 y = rnd.nextInt(map.getHeight());
             } while (!blocksMap[y][x].isAvailableForRobot());
-            targets.addLast(new Target(blocksMap[y][x].getM_middlePositionX() - 10,
-                    blocksMap[y][x].getM_middlePositionY() - 10, targetImages.get(rnd.nextInt(5))));
+            var newEnemy = new Enemy(blocksMap[y][x].getM_middlePositionX(),
+                    blocksMap[y][x].getM_middlePositionY(), "src/main/resources/images/virus.png");
+            enemies.addLast(newEnemy);
+            enemyControllers.put(newEnemy, new EnemyController(newEnemy));
         }
-        updateTargets();
     }
 
-    public ConcurrentLinkedDeque<Target> getTargets() {
-        return targets;
-    }
+    public ConcurrentLinkedDeque<Enemy> getEnemies() { return enemies; }
 
     public void clear()
     {
-        targets = new ConcurrentLinkedDeque<Target>();
+        enemies = new ConcurrentLinkedDeque<Enemy>();
+        enemyControllers = new HashMap<Enemy, EnemyController>();
     }
+
+    public HashMap<Enemy, EnemyController> getEnemyControllers() { return enemyControllers; }
 
     public void setMap(LevelMap map) { this.map = map; }
 
@@ -85,8 +79,8 @@ public class TargetGenerator
         support.removePropertyChangeListener(pcl);
     }
 
-    private void updateTargets()
+    private void updateEnemies()
     {
-        support.firePropertyChange("newTargets", null, targets);
+        support.firePropertyChange("newEnemies", null, enemies);
     }
 }

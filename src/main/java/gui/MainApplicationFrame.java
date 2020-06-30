@@ -35,7 +35,7 @@ public class MainApplicationFrame extends JFrame
 
     MainApplicationFrame()
     {
-        keeper = new StatesKeeper(new File("framesProperties.json"));
+        keeper = new StatesKeeper(new File("src/main/resources/framesProperties.json"));
         setLocationRelativeTo(null);
         setContentPane(desktopPane);
         setMinimumSize(new Dimension(750,600));
@@ -143,12 +143,11 @@ public class MainApplicationFrame extends JFrame
             {
                 automode = true;
             }
-
             GameWindow gameWindow = new GameWindow(gameWindowTitle, automode , keeper);
             logWindow.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
             gameWindow.addInternalFrameListener(getInternalFrameListener(gameWindow));
             gameWindow.setLocation(300, 50);
-            gameWindow.setSize(100, 100);
+            gameWindow.setSize(330, 350);
             return gameWindow;
         }
         catch (IOException e)
@@ -165,7 +164,6 @@ public class MainApplicationFrame extends JFrame
                 stateCoordinatesWindowTitle, gameWindow.getRobotController());
         stateCoordinatesWindow.setLocation(800, 50);
         stateCoordinatesWindow.setSize(200, 100);
-//        stateCoordinatesWindow.setText("aaa");
         return stateCoordinatesWindow;
     }
 
@@ -176,7 +174,6 @@ public class MainApplicationFrame extends JFrame
                 stateDistanceWindowTitle, gameWindow.getRobotController(), gameWindow.getTargetGenerator());
         stateDistanceWindow.setLocation(800, 250);
         stateDistanceWindow.setSize(200, 100);
-//        stateCoordinatesWindow.setText("aaa");
         return stateDistanceWindow;
     }
 

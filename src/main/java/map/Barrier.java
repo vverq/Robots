@@ -1,20 +1,21 @@
-package models;
+package map;
+
+import map.BlockMap;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Array;
 import java.util.HashMap;
 
-public class Barrier extends Block
+public class Barrier extends BlockMap
 {
     private volatile Image m_barrierImage;
     private final HashMap<String, String> images = new HashMap<>();
     {
-        images.put("wall", "images/wall.png");
-        images.put("greenWall", "images/greenWall.png");
-        images.put("iceWall", "images/iceWall.png");
+        images.put("wall", "src/main/resources/images/wall.png");
+        images.put("greenWall", "src/main/resources/images/greenWall.png");
+        images.put("iceWall", "src/main/resources/images/iceWall.png");
     };
 
     Barrier(int x, int y, String imageName)

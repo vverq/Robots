@@ -1,8 +1,8 @@
-package models;
+package map;
 
 import java.awt.*;
 
-public class Block
+public class BlockMap
 {
     private volatile int m_positionX;
     private volatile int m_positionY;
@@ -11,7 +11,7 @@ public class Block
     private static volatile int m_width = 40;
     private Image m_image;
 
-    Block(int x, int y, boolean isAvailable) {
+    BlockMap(int x, int y, boolean isAvailable) {
         m_isAvailable = isAvailable;
         m_positionX = x;
         m_positionY = y;

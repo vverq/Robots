@@ -1,0 +1,5 @@
+10 10
+f wood 0 9 0 1
+b wall 0 4 2 2
+f wood 5 9 2 2
+f gravel 0 9 3 9
